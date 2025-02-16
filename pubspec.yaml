@@ -16,7 +16,12 @@ dependencies:
   gap: ^3.0.1
   logger: ^2.5.0
   json_annotation: ^4.9.0
-  intl: ^0.20.2
+  intl: ^0.17.0
+  timeago: ^3.3.0
+  cached_network_image: ^3.4.1
+  iconsax_flutter: ^1.0.0
+  flutter_svg: ^2.0.17
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:
