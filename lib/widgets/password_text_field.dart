@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PasswordTextField extends StatefulWidget {
   final String hintText;
+  final TextEditingController? controller;
+
   const PasswordTextField({
     super.key,
     required this.hintText,
+    this.controller,
   });
 
   @override
@@ -24,14 +28,13 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           onPressed: () => setState(() {
             obscureText = !obscureText;
           }),
-          icon: Icon(!obscureText? Icons.visibility_off :Icons.visibility),
-          // color: Colors.black,
+          icon: Icon(!obscureText ? Icons.visibility_off : Icons.visibility),
         ),
         hintText: widget.hintText,
-        hintStyle: TextStyle(fontSize: 14),
-        contentPadding: EdgeInsets.only(left: 15),
+        hintStyle: TextStyle(fontSize: 14.sp),
+        contentPadding: EdgeInsets.only(left: 15.w),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(15.r),
         ),
       ),
     );

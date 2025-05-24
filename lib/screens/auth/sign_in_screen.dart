@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:project/screens/auth/sign_up_screen.dart';
 import 'package:project/widgets/auth_button.dart';
@@ -20,34 +21,35 @@ class _SignInScreenState extends State<SignInScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
+          padding: EdgeInsets.symmetric(horizontal: 25.w),
           child: Column(
             children: [
-              Gap(30),
+              Gap(30.h),
               Text(
                 'Hello Friend!',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 24,
+                  fontSize: 24.sp,
                 ),
               ),
               Text(
                 'Welcome back',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 16.sp,
                 ),
               ),
-              Gap(30),
+              Gap(30.h),
               FormTextField(
                 hintText: 'Email Address',
                 keyboardType: TextInputType.emailAddress,
               ),
-              Gap(15),
+              Gap(15.h),
               PasswordTextField(hintText: 'Password'),
-              Gap(10),
-               Align(
+              Gap(10.h),
+              Align(
                 alignment: Alignment.centerRight,
-                 child: TextButton(
+                child: TextButton(
                   style: ButtonStyle(
                     foregroundColor: WidgetStateProperty.all(Colors.black),
                   ),
@@ -56,11 +58,12 @@ class _SignInScreenState extends State<SignInScreen> {
                     'Forgot Password?',
                     style: TextStyle(
                       color: Colors.grey,
+                      fontSize: 14.sp,
                     ),
                   ),
-                               ),
-               ),
-              Gap(30),
+                ),
+              ),
+              Gap(30.h),
               TextButton(
                 style: ButtonStyle(
                   foregroundColor: WidgetStateProperty.all(Colors.black),
@@ -72,10 +75,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
+                    fontSize: 15.sp,
                   ),
                 ),
               ),
-              Gap(20),
+              Gap(20.h),
               AuthButton(
                 text: 'Log In',
               ),
