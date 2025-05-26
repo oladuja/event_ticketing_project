@@ -1,27 +1,23 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:project/widgets/event_details_textfield.dart';
 import 'package:toastification/toastification.dart';
-import 'package:image_picker/image_picker.dart';
 
-class CreateEvent extends StatefulWidget {
-  static String routeName = '/create_event';
+class EditEvent extends StatefulWidget {
+  static String routeName = '/edit_event';
 
-  const CreateEvent({super.key});
+  const EditEvent({super.key});
 
   @override
-  State<CreateEvent> createState() => _CreateEventState();
+  State<EditEvent> createState() => _EditEventState();
 }
 
-class _CreateEventState extends State<CreateEvent> {
+class _EditEventState extends State<EditEvent> {
   final TextEditingController eventNameController = TextEditingController();
   final TextEditingController eventDescriptionController =
       TextEditingController();
   final TextEditingController eventAddressController = TextEditingController();
-  File? _eventImage;
 
   final eventTypes = [
     'Conference',
@@ -41,19 +37,8 @@ class _CreateEventState extends State<CreateEvent> {
 
   String? selectedEventType;
   String? selectedCategory;
+
   DateTime? _selectedDateTime;
-
-  Future<void> pickEventImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _eventImage = File(pickedFile.path);
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +50,7 @@ class _CreateEventState extends State<CreateEvent> {
           icon: Icon(Icons.arrow_back_ios),
         ),
         title: Text(
-          'Create Event',
+          'Edit Event',
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),
@@ -166,50 +151,6 @@ class _CreateEventState extends State<CreateEvent> {
                   ),
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Gap(25.h),
-                  Text(
-                    'Event Image',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Gap(5),
-                  GestureDetector(
-                    onTap: pickEventImage,
-                    child: Container(
-                      height: 150.h,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Color(0XFF828282),
-                          width: 2.w,
-                        ),
-                        borderRadius: BorderRadius.circular(5.r),
-                        image: _eventImage != null
-                            ? DecorationImage(
-                                image: FileImage(_eventImage!),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
-                      ),
-                      child: _eventImage == null
-                          ? Center(
-                              child: Text(
-                                'Select Event Image',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16.sp,
-                                ),
-                              ),
-                            )
-                          : null,
-                    ),
-                  ),
-                ],
-              ),
               EventDetailsField(
                 title: 'Event Description',
                 child: TextField(
@@ -266,8 +207,7 @@ class _CreateEventState extends State<CreateEvent> {
                       eventAddressController.text.isNotEmpty &&
                       selectedEventType != null &&
                       _selectedDateTime != null &&
-                      selectedCategory != null &&
-                      _eventImage != null) {
+                      selectedCategory != null) {
                     Navigator.of(context).pop();
                     toastification.show(
                       context: context,
@@ -301,7 +241,7 @@ class _CreateEventState extends State<CreateEvent> {
                   ),
                   child: Center(
                     child: Text(
-                      'Add Event',
+                      'Save Changes',
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:project/screens/home/create_event.dart';
 import 'package:project/widgets/amount_text.dart';
@@ -6,10 +7,10 @@ import 'package:project/widgets/chart.dart';
 import 'package:project/widgets/details_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class HomeScreen extends StatelessWidget {
-  static String routeName = '/home_screen';
+class OrganizerHomeScreen extends StatelessWidget {
+  static String routeName = '/organizer_home_screen';
 
-  const HomeScreen({
+  const OrganizerHomeScreen({
     super.key,
   });
 
@@ -24,8 +25,8 @@ class HomeScreen extends StatelessWidget {
             child: CircleAvatar(
               radius: 20.r,
               backgroundColor: Color(0XFFD9D9D9),
-              child: Icon(
-                Icons.person,
+              child: FaIcon(
+                FontAwesomeIcons.solidUser, 
                 color: Color(0XFF6E7191),
                 size: 24.sp,
               ),
@@ -35,7 +36,7 @@ class HomeScreen extends StatelessWidget {
       ),
       backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 25.w),
+        padding: EdgeInsets.symmetric(horizontal: 15.w),
         child: SingleChildScrollView(
           child: Column(
             children: [

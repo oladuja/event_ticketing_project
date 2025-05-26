@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:project/screens/home/home_screen.dart';
+import 'package:project/screens/home/home.dart';
 import 'package:project/widgets/account_type_button.dart';
 
 class AccountTypeScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _AccountTypeScreenState extends State<AccountTypeScreen> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 25.h),
+        padding: EdgeInsets.symmetric(horizontal: 15.h),
         child: Column(
           children: [
             Gap(50.h),
@@ -49,7 +49,7 @@ class _AccountTypeScreenState extends State<AccountTypeScreen> {
                   ),
                 ],
               ),
-              child:  LayoutBuilder(
+              child: LayoutBuilder(
                 builder: (context, constraints) => Column(
                   children: [
                     GestureDetector(
@@ -87,7 +87,6 @@ class _AccountTypeScreenState extends State<AccountTypeScreen> {
                         ),
                       ),
                     ),
-                    
                     GestureDetector(
                       onTap: () => setState(() {
                         individual = 0;
@@ -137,8 +136,8 @@ class _AccountTypeScreenState extends State<AccountTypeScreen> {
             AccountTypeButton(
               title: 'Proceed',
               isBack: true,
-              onTap: () =>
-                  Navigator.of(context).pushNamed(HomeScreen.routeName),
+              onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
+                  Home.routeName, (_) => false),
             )
           ],
         ),

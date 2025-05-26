@@ -21,7 +21,7 @@ class _SignInScreenState extends State<SignInScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25.w),
+          padding: EdgeInsets.symmetric(horizontal: 15.w),
           child: Column(
             children: [
               Gap(30.h),
@@ -68,8 +68,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 style: ButtonStyle(
                   foregroundColor: WidgetStateProperty.all(Colors.black),
                 ),
-                onPressed: () => Navigator.of(context)
-                    .pushReplacementNamed(SignUpScreen.routeName),
+                onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
+                    SignUpScreen.routeName, (_) => false),
                 child: Text(
                   'Don\'t have an account? Sign Up',
                   style: TextStyle(
