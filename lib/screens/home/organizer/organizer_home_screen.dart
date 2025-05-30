@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:project/screens/home/create_event.dart';
+import 'package:project/screens/home/organizer/create_event.dart';
 import 'package:project/widgets/amount_text.dart';
 import 'package:project/widgets/chart.dart';
 import 'package:project/widgets/details_text.dart';
@@ -18,6 +18,12 @@ class OrganizerHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+          'Welcome back',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.white,
         actions: [
           Padding(
@@ -26,7 +32,7 @@ class OrganizerHomeScreen extends StatelessWidget {
               radius: 20.r,
               backgroundColor: Color(0XFFD9D9D9),
               child: FaIcon(
-                FontAwesomeIcons.solidUser, 
+                FontAwesomeIcons.solidUser,
                 color: Color(0XFF6E7191),
                 size: 24.sp,
               ),
@@ -93,6 +99,7 @@ class OrganizerHomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              Gap(20.h),
             ],
           ),
         ),

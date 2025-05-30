@@ -19,7 +19,6 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   bool checkboxStatus = false;
 
-  // Controllers for form fields
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController businessNameController = TextEditingController();
@@ -30,6 +29,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.w),

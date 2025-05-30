@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:project/screens/home/event_screen.dart';
-import 'package:project/screens/home/organizer_home_screen.dart';
-import 'package:project/screens/home/profile_screen.dart';
+import 'package:project/screens/home/organizer/event_screen.dart';
+import 'package:project/screens/home/organizer/organizer_home_screen.dart';
+import 'package:project/screens/home/organizer/profile_screen.dart';
 
 class Home extends StatefulWidget {
   static String routeName = '/home';

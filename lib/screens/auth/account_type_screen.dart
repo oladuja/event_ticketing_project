@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:project/screens/home/home.dart';
+import 'package:project/screens/home/organizer/home.dart';
 import 'package:project/widgets/account_type_button.dart';
 
 class AccountTypeScreen extends StatefulWidget {

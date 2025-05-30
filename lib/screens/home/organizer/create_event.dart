@@ -39,6 +39,23 @@ class _CreateEventState extends State<CreateEvent> {
     'Arts',
   ];
 
+  final List<Map<String, TextEditingController>> tickets = [];
+
+  void addTicketField() {
+    setState(() {
+      tickets.add({
+        'name': TextEditingController(),
+        'price': TextEditingController(),
+      });
+    });
+  }
+
+  void removeTicketField(int index) {
+    setState(() {
+      tickets.removeAt(index);
+    });
+  }
+
   String? selectedEventType;
   String? selectedCategory;
   DateTime? _selectedDateTime;
@@ -259,15 +276,99 @@ class _CreateEventState extends State<CreateEvent> {
                 ),
               ),
               Gap(20.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Tickets',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: addTicketField,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    ),
+                    child:
+                        Text('Add new', style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
+              Gap(10.h),
+              ...List.generate(tickets.length, (index) {
+                final ticket = tickets[index];
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 6.h),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: ticket['name'],
+                          cursorColor: Colors.black,
+                          decoration: InputDecoration(
+                            hintText: 'Ticket Name',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black,
+                                width: 2.w,
+                              ),
+                            ),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10.w),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10.w),
+                      Expanded(
+                        child: TextField(
+                          controller: ticket['price'],
+                          keyboardType: TextInputType.number,
+                          cursorColor: Colors.black,
+                          decoration: InputDecoration(
+                            hintText: '₦0.00',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black,
+                                width: 2.w,
+                              ),
+                            ),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10.w),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10.w),
+                      IconButton(
+                        icon: Icon(Icons.delete_outline, color: Colors.black),
+                        onPressed: () => removeTicketField(index),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              Gap(20.h),
               GestureDetector(
                 onTap: () {
+                  final hasValidTickets = tickets.isNotEmpty &&
+                      tickets.every((ticket) =>
+                          ticket['name']!.text.isNotEmpty &&
+                          ticket['price']!.text.isNotEmpty);
+
                   if (eventNameController.text.isNotEmpty &&
                       eventDescriptionController.text.isNotEmpty &&
                       eventAddressController.text.isNotEmpty &&
                       selectedEventType != null &&
                       _selectedDateTime != null &&
                       selectedCategory != null &&
-                      _eventImage != null) {
+                      _eventImage != null &&
+                      hasValidTickets) {
                     Navigator.of(context).pop();
                     toastification.show(
                       context: context,

@@ -82,6 +82,8 @@ class _SignInScreenState extends State<SignInScreen> {
               Gap(20.h),
               AuthButton(
                 text: 'Log In',
+                // onPressed: () => Navigator.of(context)
+                //     .pushReplacementNamed(SignInScreen.routeName),
               ),
             ],
           ),

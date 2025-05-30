@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:project/screens/home/edit_event_scree.dart';
+import 'package:project/screens/home/organizer/edit_event_scree.dart';
 
 class EventScreen extends StatelessWidget {
   static String routeName = '/event_screen';
@@ -26,9 +26,17 @@ class EventScreen extends StatelessWidget {
             margin: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(15.r),
             ),
             child: ListTile(
+              leading: Container(
+                width: 50.h,
+                height: 50.h,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
               title: Text(
                 'Ife & Temi Live Concert \nLocation: Lagos',
                 style: TextStyle(

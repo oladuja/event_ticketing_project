@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:project/screens/home/organizer/edit_profile.dart';
 
 class ProfileScreen extends StatelessWidget {
   static String routeName = '/profile_screen';
@@ -44,6 +45,26 @@ class ProfileScreen extends StatelessWidget {
                     radius: 25.r,
                     backgroundColor: Colors.black,
                   ),
+                  trailing: GestureDetector(
+                    onTap: () => Navigator.of(context)
+                        .pushNamed(EditProfileScreen.routeName),
+                    child: Container(
+                      padding: EdgeInsets.all(8.0.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0.r),
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 2,
+                        ),
+                      ),
+                      child: Text(
+                        'Edit Profile',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Gap(20.h),
@@ -58,7 +79,10 @@ class ProfileScreen extends StatelessWidget {
               Gap(10.h),
               profileText('Email Address', 'theife@gmail.com'),
               Gap(10.h),
+              profileText('Business Name', 'The Ife Entertainment'),
+              Gap(10.h),
               profileText('Phone', '+2348123456789'),
+              Gap(10.h),
             ],
           ),
         ),

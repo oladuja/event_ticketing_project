@@ -3,12 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:project/screens/auth/account_type_screen.dart';
 import 'package:project/screens/auth/sign_in_screen.dart';
 import 'package:project/screens/auth/sign_up_screen.dart';
-import 'package:project/screens/home/create_event.dart';
-import 'package:project/screens/home/edit_event_scree.dart';
-import 'package:project/screens/home/event_screen.dart';
-import 'package:project/screens/home/home.dart';
-import 'package:project/screens/home/organizer_home_screen.dart';
-import 'package:project/screens/home/profile_screen.dart';
+import 'package:project/screens/home/regular_user/list_of_event_screeen.dart';
+import 'package:project/screens/home/organizer/create_event.dart';
+import 'package:project/screens/home/organizer/edit_event_scree.dart';
+import 'package:project/screens/home/organizer/edit_profile.dart';
+import 'package:project/screens/home/organizer/event_screen.dart';
+import 'package:project/screens/home/organizer/home.dart';
+import 'package:project/screens/home/organizer/organizer_home_screen.dart';
+import 'package:project/screens/home/organizer/profile_screen.dart';
+import 'package:project/screens/home/regular_user/regular_user_home.dart';
+import 'package:project/screens/home/regular_user/regular_user_home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,8 +40,12 @@ class MyApp extends StatelessWidget {
           EventScreen.routeName: (_) => const EventScreen(),
           EditEvent.routeName: (_) => const EditEvent(),
           ProfileScreen.routeName: (_) => const ProfileScreen(),
+          EditProfileScreen.routeName: (_) => const EditProfileScreen(),
+          RegularUserHome.routeName: (_) => const RegularUserHome(),
+          RegularHomeScreen.routeName: (_) => const RegularHomeScreen(),
+          ListOfEventScreeen.routeName: (_) => const ListOfEventScreeen(),
         },
-        initialRoute: SignUpScreen.routeName,
+        initialRoute: RegularUserHome.routeName,
       ),
     );
   }
