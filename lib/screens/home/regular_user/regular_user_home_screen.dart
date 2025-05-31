@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:project/screens/home/regular_user/ticket_details_screen.dart';
 
 class RegularHomeScreen extends StatelessWidget {
   static String routeName = '/regular_user_home_screen';
@@ -24,25 +25,32 @@ class RegularHomeScreen extends StatelessWidget {
         child: ListView.builder(
           itemCount: 10,
           itemBuilder: (_, i) {
-            return ListTile(
-              leading: Container(
-                width: 50.h,
-                height: 50.h,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(8.r),
+            return GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => TicketDetailsScreen(tag: i),
                 ),
               ),
-              title: Text(
-                'Ife & Temi Live Concert \nLocation: Lagos',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+              child: ListTile(
+                leading: Container(
+                  width: 50.h,
+                  height: 50.h,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
                 ),
-              ),
-              trailing: Text('Ticket Type: \nRegular'),
-              subtitle: Text(
-                'Date Purchased ${DateFormat.yMEd().add_jms().format(DateTime.now())}',
-                style: TextStyle(fontSize: 12.sp),
+                title: Text(
+                  'Ife & Temi Live Concert \nLocation: Lagos',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: Text('Ticket Type: \nRegular'),
+                subtitle: Text(
+                  'Date Purchased ${DateFormat.yMEd().add_jms().format(DateTime.now())}',
+                  style: TextStyle(fontSize: 12.sp),
+                ),
               ),
             );
           },
