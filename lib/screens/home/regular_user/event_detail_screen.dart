@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutterwave_standard/core/flutterwave.dart';
+import 'package:flutterwave_standard/models/requests/customer.dart';
+import 'package:flutterwave_standard/models/requests/customizations.dart';
+import 'package:flutterwave_standard/models/responses/charge_response.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 class EventDetailScreen extends StatefulWidget {
   static String routeName = 'event_details_screen';
@@ -167,12 +172,39 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   Gap(10.w),
                   ElevatedButton(
                     onPressed: () {
-                      // final total = ticketPrices[selectedTicket]! * quantity;
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //   SnackBar(
-                      //       content: Text(
-                      //           'Buying $quantity x $selectedTicket for ₦$total')),
-                      // );
+                      onTap:
+                      () async {
+                        try {
+                          final Customer customer = Customer(
+                              name: "Flutterwave Developer",
+                              phoneNumber: "1234566677777",
+                              email: "customer@customer.com");
+                          final Flutterwave flutterwave = Flutterwave(
+                              publicKey:
+                                  "FLWPUBK_TEST-8248fd5f2c301eed1e7ddc771d83a43d-X",
+                              currency: "NGN",
+                              redirectUrl: "https://google.com",
+                              txRef: DateTime.now().toString(),
+                              amount: "100",
+                              customer: customer,
+                              paymentOptions: "card",
+                              customization: Customization(
+                                  title: 'Pay Now', description: 'Pay Now'),
+                              isTestMode: true);
+
+                          final ChargeResponse response =
+                              await flutterwave.charge(context);
+
+                          Logger().d(
+                            "Payment successful: ${response.toJson()}",
+                          );
+                          if (response.status == 'successful') {
+                            // Perform some things in the database
+                          }
+                        } catch (e) {
+                          debugPrint(e.toString());
+                        }
+                      };
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,

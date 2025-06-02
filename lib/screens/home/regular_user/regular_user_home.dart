@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:project/screens/home/regular_user/list_of_event_screeen.dart';
-import 'package:project/screens/home/organizer/profile_screen.dart';
 import 'package:project/screens/home/regular_user/regular_user_home_screen.dart';
+import 'package:project/screens/home/regular_user/user_profile_screen.dart';
 
 class RegularUserHome extends StatefulWidget {
   static String routeName = '/regular_user_home';
@@ -18,7 +18,7 @@ class _RegularUserHomeState extends State<RegularUserHome> {
   final List<Widget> pages = [
     RegularHomeScreen(),
     ListOfEventScreeen(),
-    ProfileScreen(),
+    UserProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {

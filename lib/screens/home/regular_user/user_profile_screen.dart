@@ -1,0 +1,125 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
+import 'package:project/screens/home/organizer/edit_profile.dart';
+import 'package:project/screens/home/regular_user/saved_card_screen.dart';
+
+class UserProfileScreen extends StatelessWidget {
+  const UserProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Gap(50.h),
+              Text(
+                'My Profile',
+                style: TextStyle(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Gap(10.h),
+              Container(
+                padding: EdgeInsets.all(5.w),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15.r)),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    'Taiwo Ife',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text('theife@gmail.com'),
+                  leading: CircleAvatar(
+                    radius: 25.r,
+                    backgroundColor: Colors.black,
+                  ),
+                  trailing: GestureDetector(
+                    onTap: () => Navigator.of(context)
+                        .pushNamed(EditProfileScreen.routeName),
+                    child: Container(
+                      padding: EdgeInsets.all(8.0.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0.r),
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 2,
+                        ),
+                      ),
+                      child: Text(
+                        'Edit Profile',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Gap(20.h),
+              Text(
+                'Personal Information',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
+              ),
+              Gap(10.h),
+              profileText('First Name', 'Taiwo'),
+              Gap(10.h),
+              profileText('Last Name', 'Ife'),
+              Gap(10.h),
+              profileText('Email Address', 'theife@gmail.com'),
+              Gap(10.h),
+              profileText('Phone', '+2348123456789'),
+              Gap(10.h),
+              Divider(),
+              GestureDetector(
+                onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (_) => SavedCardsScreen())),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    'Payment Method',
+                    style:
+                        TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                  ),
+                  leading: FaIcon(FontAwesomeIcons.moneyBill),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget profileText(String title, String data) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 14.sp,
+            ),
+          ),
+          Gap(5.h),
+          Text(
+            data,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 16.sp,
+            ),
+          ),
+        ],
+      );
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
+import 'package:project/screens/home/regular_user/ticket_qr_code.dart';
 import 'package:project/widgets/auth_button.dart';
 
 class TicketDetailsScreen extends StatelessWidget {
@@ -58,6 +59,9 @@ class TicketDetailsScreen extends StatelessWidget {
                   DateFormat.yMEd().add_jms().format(DateTime.now())),
               Gap(20.h),
               AuthButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const QRGeneratorScreen()),
+                ),
                 text: 'SHOW QR CODE',
                 backgroundColor: Colors.black,
                 width: double.infinity,
