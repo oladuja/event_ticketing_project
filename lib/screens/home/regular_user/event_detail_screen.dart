@@ -171,40 +171,37 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   ),
                   Gap(10.w),
                   ElevatedButton(
-                    onPressed: () {
-                      onTap:
-                      () async {
-                        try {
-                          final Customer customer = Customer(
-                              name: "Flutterwave Developer",
-                              phoneNumber: "1234566677777",
-                              email: "customer@customer.com");
-                          final Flutterwave flutterwave = Flutterwave(
-                              publicKey:
-                                  "FLWPUBK_TEST-8248fd5f2c301eed1e7ddc771d83a43d-X",
-                              currency: "NGN",
-                              redirectUrl: "https://google.com",
-                              txRef: DateTime.now().toString(),
-                              amount: "100",
-                              customer: customer,
-                              paymentOptions: "card",
-                              customization: Customization(
-                                  title: 'Pay Now', description: 'Pay Now'),
-                              isTestMode: true);
+                    onPressed: () async {
+                      try {
+                        final Customer customer = Customer(
+                            name: "Flutterwave Developer",
+                            phoneNumber: "1234566677777",
+                            email: "customer@customer.com");
+                        final Flutterwave flutterwave = Flutterwave(
+                            publicKey:
+                                "FLWPUBK_TEST-8248fd5f2c301eed1e7ddc771d83a43d-X",
+                            currency: "NGN",
+                            redirectUrl: "https://google.com",
+                            txRef: DateTime.now().toString(),
+                            amount: "100",
+                            customer: customer,
+                            paymentOptions: "card",
+                            customization: Customization(
+                                title: 'Pay Now', description: 'Pay Now'),
+                            isTestMode: true);
 
-                          final ChargeResponse response =
-                              await flutterwave.charge(context);
+                        final ChargeResponse response =
+                            await flutterwave.charge(context);
 
-                          Logger().d(
-                            "Payment successful: ${response.toJson()}",
-                          );
-                          if (response.status == 'successful') {
-                            // Perform some things in the database
-                          }
-                        } catch (e) {
-                          debugPrint(e.toString());
+                        Logger().d(
+                          "Payment successful: ${response.toJson()}",
+                        );
+                        if (response.status == 'successful') {
+                          // Perform some things in the database
                         }
-                      };
+                      } catch (e) {
+                        debugPrint(e.toString());
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
