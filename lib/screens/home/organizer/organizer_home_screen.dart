@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:project/screens/home/organizer/create_event.dart';
 import 'package:project/widgets/amount_text.dart';
-import 'package:project/widgets/chart.dart';
 import 'package:project/widgets/details_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -25,20 +24,20 @@ class OrganizerHomeScreen extends StatelessWidget {
           ),
         ),
         backgroundColor: Colors.white,
-        actions: [
-          Padding(
-            padding: EdgeInsets.all(8.0.w),
-            child: CircleAvatar(
-              radius: 20.r,
-              backgroundColor: Color(0XFFD9D9D9),
-              child: FaIcon(
-                FontAwesomeIcons.solidUser,
-                color: Color(0XFF6E7191),
-                size: 24.sp,
-              ),
-            ),
-          ),
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: EdgeInsets.all(8.0.w),
+        //     child: CircleAvatar(
+        //       radius: 20.r,
+        //       backgroundColor: Color(0XFFD9D9D9),
+        //       child: FaIcon(
+        //         FontAwesomeIcons.solidUser,
+        //         color: Color(0XFF6E7191),
+        //         size: 24.sp,
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ),
       backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       body: Padding(

@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:logger/web.dart';
 import 'package:project/widgets/event_details_textfield.dart';
 import 'package:toastification/toastification.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,11 +19,41 @@ class CreateEvent extends StatefulWidget {
 }
 
 class _CreateEventState extends State<CreateEvent> {
+  final dio = Dio();
   final TextEditingController eventNameController = TextEditingController();
   final TextEditingController eventDescriptionController =
       TextEditingController();
   final TextEditingController eventAddressController = TextEditingController();
   File? _eventImage;
+
+  Future<void> uploadToUploadcare(File file) async {
+    final data = FormData.fromMap({
+      'UPLOADCARE_PUB_KEY': '7438886172631afe26cb',
+      'UPLOADCARE_STORE': '1',
+      'file': await MultipartFile.fromFile(file.path),
+    });
+
+    try {
+      final response = await dio.post(
+        'https://upload.uploadcare.com/base/',
+        data: data,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final fileUrl = "https://ucarecdn.com/${response.data['file']}/";
+        Logger().i("Uploaded successfully: $fileUrl");
+      } else {
+        Logger().i("Upload failed: ${response.statusCode}");
+      }
+    } catch (e) {
+      Logger().i("Error uploading: $e");
+    }
+  }
 
   final eventTypes = [
     'Conference',
@@ -370,6 +402,7 @@ class _CreateEventState extends State<CreateEvent> {
                       _eventImage != null &&
                       hasValidTickets) {
                     Navigator.of(context).pop();
+                    uploadToUploadcare(_eventImage!);
                     toastification.show(
                       context: context,
                       type: ToastificationType.success,
