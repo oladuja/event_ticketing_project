@@ -78,24 +78,32 @@ class OrganizerHomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              Gap(20.h),
-              BarChartSample2(),
+              // Gap(20.h),
+              // BarChartSample2(),
               Gap(50.h),
               Container(
-                width: double.infinity,
+                width:150.h,
+                height: 150.h,
                 padding: EdgeInsets.all(15.w),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15.r),
                   color: Color(0XFF518E99),
                 ),
                 child: Center(
-                  child: Text(
-                    'Scan Ticket',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FaIcon(FontAwesomeIcons.qrcode,size:80.sp , color: Colors.white,),
+                      Gap(10.h),
+                      Text(
+                        'Scan Ticket',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

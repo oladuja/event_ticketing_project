@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:project/screens/auth/account_type_screen.dart';
 import 'package:project/screens/auth/sign_in_screen.dart';
+import 'package:project/screens/home/organizer/home.dart';
+import 'package:project/screens/home/regular_user/regular_user_home.dart';
 import 'package:project/widgets/auth_button.dart';
 import 'package:project/widgets/form_text_field.dart';
 import 'package:project/widgets/password_text_field.dart';
@@ -26,6 +27,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
+  String selectedType = 'Individual';
+  final List<String> accountTypes = ['Individual', 'Organization'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +49,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 Text(
-                  'Tell us more about your organization',
+                  'You can register on our platform',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.sp,
@@ -64,12 +68,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   keyboardType: TextInputType.phone,
                 ),
                 Gap(15.h),
-                FormTextField(
-                  controller: businessNameController,
-                  hintText: 'Register business name',
-                  keyboardType: TextInputType.text,
+
+                // DropdownButton for user type
+                DropdownButtonFormField<String>(
+                  value: selectedType,
+                  items: accountTypes.map((type) {
+                    return DropdownMenuItem(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    hintStyle: TextStyle(fontSize: 14.sp),
+                    contentPadding: EdgeInsets.only(left: 15.w),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.r),
+                    ),
+                    labelText: 'Registering as',
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedType = value!;
+                    });
+                  },
                 ),
                 Gap(15.h),
+
+                if (selectedType == 'Organization')
+                  Column(
+                    children: [
+                      FormTextField(
+                        controller: businessNameController,
+                        hintText: 'Register business name',
+                        keyboardType: TextInputType.text,
+                      ),
+                      Gap(15.h),
+                    ],
+                  ),
+
                 PasswordTextField(
                   controller: passwordController,
                   hintText: 'Password',
@@ -101,8 +137,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 AuthButton(
-                  onPressed: () => Navigator.of(context)
-                      .pushNamed(AccountTypeScreen.routeName),
+                  onPressed: () {
+                    final targetRoute = selectedType == 'Organization'
+                        ? Home.routeName
+                        : RegularUserHome.routeName;
+
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      targetRoute,
+                      (_) => false,
+                    );
+                  },
                   text: 'Sign Up',
                 ),
                 Gap(20.h),

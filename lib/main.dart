@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:project/screens/auth/account_type_screen.dart';
+// import 'package:project/screens/auth/account_type_screen.dart';
 import 'package:project/screens/auth/sign_in_screen.dart';
 import 'package:project/screens/auth/sign_up_screen.dart';
 import 'package:project/screens/home/regular_user/list_of_event_screeen.dart';
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         routes: {
           SignUpScreen.routeName: (_) => const SignUpScreen(),
           SignInScreen.routeName: (_) => const SignInScreen(),
-          AccountTypeScreen.routeName: (_) => const AccountTypeScreen(),
+          // AccountTypeScreen.routeName: (_) => const AccountTypeScreen(),
           OrganizerHomeScreen.routeName: (_) => const OrganizerHomeScreen(),
           CreateEvent.routeName: (_) => const CreateEvent(),
           Home.routeName: (_) => const Home(),
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
           RegularHomeScreen.routeName: (_) => const RegularHomeScreen(),
           ListOfEventScreeen.routeName: (_) => const ListOfEventScreeen(),
         },
-        initialRoute: RegularUserHome.routeName,
+        initialRoute: SignInScreen.routeName,
       ),
     );
   }
