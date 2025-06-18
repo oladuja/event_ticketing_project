@@ -26,8 +26,9 @@ class AuthButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: (width ?? MediaQuery.of(context).size.width / 2).w,
-      height: (height ?? 50).h,
+      // width: (width ?? MediaQuery.of(context).size.width / 2).w,
+      width: double.infinity,
+      height: (height ?? 45).h,
       child: FilledButton(
         style: ButtonStyle(
           foregroundColor:

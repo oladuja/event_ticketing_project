@@ -42,9 +42,8 @@ class RegularHomeScreen extends StatelessWidget {
                 ),
                 title: Text(
                   'Ife & Temi Live Concert \nLocation: Lagos',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                 ),
                 trailing: Text('Ticket Type: \nRegular'),
                 subtitle: Text(

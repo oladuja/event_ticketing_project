@@ -17,7 +17,7 @@ class ListOfEventScreeen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       ),
       backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       body: ListView.builder(
@@ -49,12 +49,13 @@ class ListOfEventScreeen extends StatelessWidget {
                 ),
                 title: Text(
                   'Ife & Temi Live Concert \nLocation: Lagos',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                 ),
                 subtitle: Text(
-                    '${DateFormat.yMEd().add_jms().format(DateTime.now())}\nPrice: ₦5,000'),
+                  '${DateFormat.yMEd().add_jms().format(DateTime.now())}\nPrice: ₦5,000\n100 Ticket(s) Left',
+                  style: TextStyle(fontSize: 12.sp),
+                ),
               ),
             ),
           );

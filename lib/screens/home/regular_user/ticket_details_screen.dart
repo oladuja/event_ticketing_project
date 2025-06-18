@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import 'package:project/screens/home/regular_user/ticket_qr_code.dart';
-import 'package:project/widgets/auth_button.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class TicketDetailsScreen extends StatelessWidget {
+  final String data = "Hello, this is QR data!";
+
   final dynamic tag;
   const TicketDetailsScreen({super.key, required this.tag});
 
@@ -26,19 +27,13 @@ class TicketDetailsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Hero(
-                tag: tag,
-                child: Container(
-                  width: double.infinity,
-                  height: 200.h,
-                  decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(15.r)
-                      // image: DecorationImage(image: AssetImage())
-                      ),
+              Center(
+                child: QrImageView(
+                  data: data,
+                  version: QrVersions.auto,
+                  size: 250.h,
                 ),
               ),
-              Gap(10.h),
               Text(
                 'Ife & Temi Live Concert',
                 style: TextStyle(
@@ -47,7 +42,11 @@ class TicketDetailsScreen extends StatelessWidget {
                 ),
               ),
               Gap(10.h),
-              ticketInformation('ORGANIZER', 'Taiwo Ifeoluwa'),
+              ticketInformation('TICKET ID', '213213NK1N2L32L13'),
+              Gap(5.h),
+              ticketInformation('EVENT ORGANIZER', 'Taiwo Ifeoluwa'),
+              Gap(5.h),
+              ticketInformation('EVENT LOCATION', 'LAGOS'),
               Gap(5.h),
               ticketInformation('PRICE', '₦5,000.00'),
               Gap(5.h),
@@ -57,15 +56,6 @@ class TicketDetailsScreen extends StatelessWidget {
               Gap(5.h),
               ticketInformation('DATE & TIME',
                   DateFormat.yMEd().add_jms().format(DateTime.now())),
-              Gap(20.h),
-              AuthButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const QRGeneratorScreen()),
-                ),
-                text: 'SHOW QR CODE',
-                backgroundColor: Colors.black,
-                width: double.infinity,
-              ),
               Gap(20.h),
             ],
           ),
@@ -82,13 +72,13 @@ class TicketDetailsScreen extends StatelessWidget {
           title,
           style: TextStyle(
             color: Colors.black54,
-            fontWeight: FontWeight.bold,
             fontSize: 14.sp,
           ),
         ),
         Text(
           value,
           style: TextStyle(
+            fontWeight: FontWeight.bold,
             color: Colors.black,
             fontSize: 16.sp,
           ),

@@ -107,6 +107,34 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 ],
               ),
               Gap(10.h),
+              Row(
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.ticket,
+                    size: 16.sp,
+                  ),
+                  Gap(8.w),
+                  Text(
+                    '100 Ticket(s) Left',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Gap(10.h),
+              Row(
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.userGroup,
+                    size: 16.sp,
+                  ),
+                  Gap(8.w),
+                  Text(
+                    'Organized By Temi',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Gap(10.h),
               Wrap(
                 spacing: 8.h,
                 children: ticketPrices.keys.map((ticket) {

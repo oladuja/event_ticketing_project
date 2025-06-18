@@ -44,7 +44,7 @@ class _EditEventState extends State<EditEvent> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 245, 245, 245),
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: Icon(Icons.arrow_back_ios),

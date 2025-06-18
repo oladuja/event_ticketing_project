@@ -24,6 +24,7 @@ class _CreateEventState extends State<CreateEvent> {
   final TextEditingController eventDescriptionController =
       TextEditingController();
   final TextEditingController eventAddressController = TextEditingController();
+  final TextEditingController noOfTicketsController = TextEditingController();
   File? _eventImage;
 
   Future<void> uploadToUploadcare(File file) async {
@@ -48,10 +49,10 @@ class _CreateEventState extends State<CreateEvent> {
         final fileUrl = "https://ucarecdn.com/${response.data['file']}/";
         Logger().i("Uploaded successfully: $fileUrl");
       } else {
-        Logger().i("Upload failed: ${response.statusCode}");
+        Logger().e("Upload failed: ${response.statusCode}");
       }
     } catch (e) {
-      Logger().i("Error uploading: $e");
+      Logger().e("Error uploading: $e");
     }
   }
 
@@ -108,7 +109,7 @@ class _CreateEventState extends State<CreateEvent> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 245, 245, 245),
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: Icon(Icons.arrow_back_ios),
@@ -274,6 +275,20 @@ class _CreateEventState extends State<CreateEvent> {
                 ),
               ),
               EventDetailsField(
+                title: 'Number of Tickets',
+                child: TextField(
+                  controller: noOfTicketsController,
+                  cursorColor: Colors.black,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.zero,
+                    enabledBorder: InputBorder.none,
+                    border: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                  ),
+                ),
+              ),
+              EventDetailsField(
                 title: 'Category',
                 child: DropdownButtonFormField(
                   items: [
@@ -396,9 +411,11 @@ class _CreateEventState extends State<CreateEvent> {
                   if (eventNameController.text.isNotEmpty &&
                       eventDescriptionController.text.isNotEmpty &&
                       eventAddressController.text.isNotEmpty &&
+                      noOfTicketsController.text.isNotEmpty &&
                       selectedEventType != null &&
                       _selectedDateTime != null &&
                       selectedCategory != null &&
+                      _eventImage != null &&
                       _eventImage != null &&
                       hasValidTickets) {
                     Navigator.of(context).pop();
