@@ -10,7 +10,8 @@ class ProfileWidget extends StatelessWidget {
   const ProfileWidget({
     super.key,
     required this.onTap,
-    required this.text, required this.icon,
+    required this.text,
+    required this.icon,
   });
 
   @override

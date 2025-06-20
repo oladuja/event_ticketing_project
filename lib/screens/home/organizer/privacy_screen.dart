@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -7,70 +9,73 @@ class PrivacyPolicyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Privacy Policy'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+        title: const Text('Privacy Policy',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            )),
       ),
+      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(15.0.w),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
                 'Privacy Policy',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              SizedBox(height: 16),
+              Gap(16.h),
               Text(
                 'Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal information.',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16.sp),
               ),
-              SizedBox(height: 16),
+              Gap(16.h),
               Text(
                 'Information We Collect',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
-              SizedBox(height: 8),
+              Gap(8.h),
               Text(
                 '- Personal information (e.g., name, email address)\n'
                 '- Usage data (e.g., app interactions)\n'
                 '- Device information (e.g., device type, OS)',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16.sp),
               ),
-              SizedBox(height: 16),
+              Gap(16.h),
               Text(
                 'How We Use Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
               ),
-              SizedBox(height: 8),
+              Gap(8.h),
               Text(
                 '- To provide and maintain our services\n'
                 '- To improve user experience\n'
                 '- To send important updates',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16.sp),
               ),
-              SizedBox(height: 16),
+              Gap(16.h),
               Text(
                 'Data Protection',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
               ),
-              SizedBox(height: 8),
+              Gap(8.h),
               Text(
                 'We take reasonable measures to protect your information from unauthorized access.',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16.sp),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 16.h),
               Text(
                 'Contact Us',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
               ),
-              SizedBox(height: 8),
+              Gap(16.h),
               Text(
                 'If you have any questions about this Privacy Policy, contact us at support@example.com.',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16.h),
               ),
             ],
           ),

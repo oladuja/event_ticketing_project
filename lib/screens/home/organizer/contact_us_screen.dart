@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 
 class ContactUsScreen extends StatefulWidget {
   const ContactUsScreen({super.key});
@@ -24,7 +25,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Simulate sending message (e.g., to Firebase, API, etc.)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Message sent successfully')),
       );
@@ -36,40 +36,43 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Contact Us'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+        title: const Text(
+          'Contact Us',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0.sp),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              const Text(
+              Text(
                 'We’d love to hear from you!',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 24),
-
+              Gap(24.h),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Name',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15.r),
+                  ),
                 ),
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Enter your name' : null,
               ),
-              const SizedBox(height: 16),
-
+              Gap(16.h),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: 'Email Address',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15.r),
+                  ),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
@@ -81,27 +84,31 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
-
+              Gap(16.h),
               TextFormField(
                 controller: _messageController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Message',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15.r),
+                  ),
                 ),
-                maxLines: 5,
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Enter your message' : null,
+                maxLines: 4,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Enter your message'
+                    : null,
               ),
-              const SizedBox(height: 24),
-
+              Gap(24.h),
               ElevatedButton(
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(vertical: 14.w),
                 ),
-                child: const Text('Send Message'),
+                child: const Text(
+                  'Send Message',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),

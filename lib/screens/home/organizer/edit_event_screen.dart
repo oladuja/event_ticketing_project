@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/event_details_textfield.dart';
 import 'package:toastification/toastification.dart';
 
@@ -209,26 +210,18 @@ class _EditEventState extends State<EditEvent> {
                       _selectedDateTime != null &&
                       selectedCategory != null) {
                     Navigator.of(context).pop();
-                    toastification.show(
-                      context: context,
-                      type: ToastificationType.success,
-                      style: ToastificationStyle.fillColored,
-                      title: Text(
-                        'You have successfully created an event.',
-                        overflow: TextOverflow.visible,
-                      ),
-                      autoCloseDuration: const Duration(seconds: 4),
+                 
+                    showToast(
+                      'Event updated successfully!',
+                      ToastificationType.success,
+                      context,
                     );
                   } else {
-                    toastification.show(
-                      context: context,
-                      type: ToastificationType.error,
-                      style: ToastificationStyle.fillColored,
-                      title: Text(
-                        'Please fill all fields before adding an event.',
-                        overflow: TextOverflow.visible,
-                      ),
-                      autoCloseDuration: const Duration(seconds: 4),
+                
+                    showToast(
+                      'Please fill all fields before adding an event.',
+                      ToastificationType.error,
+                      context,
                     );
                   }
                 },

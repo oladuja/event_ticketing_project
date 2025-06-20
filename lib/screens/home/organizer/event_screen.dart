@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:project/screens/home/organizer/attendees_screen.dart';
-import 'package:project/screens/home/organizer/edit_event_scree.dart';
+import 'package:project/screens/home/organizer/edit_event_screen.dart';
 
 class EventScreen extends StatelessWidget {
   static String routeName = '/event_screen';

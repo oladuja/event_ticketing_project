@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:project/screens/auth/sign_in_screen.dart';
+import 'package:project/screens/home/organizer/contact_us_screen.dart';
 import 'package:project/screens/home/organizer/edit_profile.dart';
 import 'package:project/screens/home/organizer/payout_screen.dart';
-import 'package:project/screens/home/organizer/privacy_screen,dart';
+import 'package:project/screens/home/organizer/privacy_screen.dart';
+import 'package:project/screens/home/organizer/tc_screen.dart';
 import 'package:project/widgets/profile_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -87,7 +90,7 @@ class ProfileScreen extends StatelessWidget {
               // profileText('Business Name', 'The Ife Entertainment'),
               // Gap(10.h),
               // profileText('Phone', '+2348123456789'),
-              Gap(10.h),
+              // Gap(10.h),
               ProfileWidget(
                 onTap: () => Navigator.of(context)
                     .push(MaterialPageRoute(builder: (_) => PayoutScreen())),
@@ -105,17 +108,28 @@ class ProfileScreen extends StatelessWidget {
               ),
               ProfileWidget(
                 text: 'Terms & Conditions',
-                onTap: () {},
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const TermsConditionsScreen(),
+                  ),
+                ),
                 icon: Icons.rule,
               ),
               ProfileWidget(
                 text: 'Contact Us',
-                onTap: () {},
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ContactUsScreen(),
+                  ),
+                ),
                 icon: Icons.contacts,
               ),
               ProfileWidget(
                 text: 'Logout',
-                onTap: () {},
+                onTap: () => Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const SignInScreen()),
+                  (_) => false,
+                ),
                 icon: Icons.logout,
               ),
             ],
@@ -125,25 +139,25 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-//   Widget profileText(String title, String data) => Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             title,
-//             style: TextStyle(
-//               color: Colors.black87,
-//               fontSize: 14.sp,
-//             ),
-//           ),
-//           Gap(5.h),
-//           Text(
-//             data,
-//             style: TextStyle(
-//               color: Colors.black,
-//               fontWeight: FontWeight.bold,
-//               fontSize: 16.sp,
-//             ),
-//           ),
-//         ],
-//       );
+  // Widget profileText(String title, String data) => Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           title,
+  //           style: TextStyle(
+  //             color: Colors.black87,
+  //             fontSize: 14.sp,
+  //           ),
+  //         ),
+  //         Gap(5.h),
+  //         Text(
+  //           data,
+  //           style: TextStyle(
+  //             color: Colors.black,
+  //             fontWeight: FontWeight.bold,
+  //             fontSize: 16.sp,
+  //           ),
+  //         ),
+  //       ],
+  //     );
 }
