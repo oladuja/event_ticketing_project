@@ -139,7 +139,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 spacing: 8.h,
                 children: ticketPrices.keys.map((ticket) {
                   return ChoiceChip(
-                    selectedColor: Color(0XFF518E99).withOpacity(0.3),
+                    selectedColor:
+                        Color(0xFF518E99).withAlpha((0.3 * 255).toInt()),
                     label: Text(ticket),
                     selected: selectedTicket == ticket,
                     onSelected: (_) {

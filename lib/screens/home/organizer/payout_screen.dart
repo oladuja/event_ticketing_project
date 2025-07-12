@@ -17,6 +17,7 @@ class PayoutScreen extends StatelessWidget {
           'Payout',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       ),
       backgroundColor: const Color.fromARGB(255, 245, 245, 245),
       body: Padding(

@@ -15,15 +15,26 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int selectedPageIndex = 0;
-  final List<Widget> pages = [
-    OrganizerHomeScreen(),
-    EventScreen(),
-    ProfileScreen(),
-  ];
+
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = const [
+      OrganizerHomeScreen(),
+      EventScreen(),
+      ProfileScreen(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[selectedPageIndex],
+      body: IndexedStack(
+        index: selectedPageIndex,
+        children: pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         selectedLabelStyle:
             TextStyle(fontSize: 9.sp, fontWeight: FontWeight.bold),

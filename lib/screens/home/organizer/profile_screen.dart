@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:project/screens/auth/sign_in_screen.dart';
 import 'package:project/screens/home/organizer/contact_us_screen.dart';
 import 'package:project/screens/home/organizer/edit_profile.dart';
 import 'package:project/screens/home/organizer/payout_screen.dart';
 import 'package:project/screens/home/organizer/privacy_screen.dart';
 import 'package:project/screens/home/organizer/tc_screen.dart';
+import 'package:project/services/auth_service.dart';
+import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/profile_widget.dart';
+import 'package:toastification/toastification.dart';
 
 class ProfileScreen extends StatelessWidget {
   static String routeName = '/profile_screen';
@@ -126,10 +128,17 @@ class ProfileScreen extends StatelessWidget {
               ),
               ProfileWidget(
                 text: 'Logout',
-                onTap: () => Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const SignInScreen()),
-                  (_) => false,
-                ),
+                onTap: () async {
+                  try {
+                    await AuthService().signOut();
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    showToast(
+                        'An error occurred while logging out. Please try again.',
+                        ToastificationType.error,
+                        context);
+                  }
+                },
                 icon: Icons.logout,
               ),
             ],

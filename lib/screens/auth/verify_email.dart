@@ -3,12 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:logger/web.dart';
 import 'package:project/screens/auth/sign_in_screen.dart';
 import 'package:project/screens/home/organizer/home.dart';
 import 'package:project/screens/home/regular_user/regular_user_home.dart';
 import 'package:project/services/database_service.dart';
+import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/auth_button.dart';
 import 'dart:async';
+
+import 'package:toastification/toastification.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   const VerifyEmailScreen({super.key});
@@ -57,20 +61,21 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false);
     } else {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email not verified yet')),
-      );
+
+      showToast('Please verify your email to continue.',
+          ToastificationType.warning, context);
     }
     setState(() => isVerifying = false);
   }
 
   Future<void> _resendEmail() async {
     final user = FirebaseAuth.instance.currentUser;
+    Logger().i(user);
     await user?.sendEmailVerification();
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Verification email resent')),
-    );
+
+    showToast('Verification email resent. Please check your inbox.',
+        ToastificationType.success, context);
     _startCooldown();
   }
 

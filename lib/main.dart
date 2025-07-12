@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/user.dart';
 import 'package:project/providers/user_provider.dart';
 import 'package:project/screens/auth/forgot_password_screen.dart';
@@ -76,15 +77,51 @@ class MyApp extends StatelessWidget {
             }
 
             final uid = snapshot.data!.uid;
-            final userProvider =
-                Provider.of<UserProvider>(context, listen: false);
+            // final userProvider =
+            //     Provider.of<UserProvider>(context, listen: false);
+
+            // return FutureBuilder<UserModel?>(
+            //   future: DatabaseService().getUser(uid),
+            //   builder: (context, userSnapshot) {
+            //     if (userSnapshot.connectionState == ConnectionState.waiting) {
+            //       return Scaffold(
+            //           body: Center(
+            //         child: LoadingAnimationWidget.staggeredDotsWave(
+            //           color: Colors.black,
+            //           size: 30.sp,
+            //         ),
+            //       ));
+            //     }
+
+            //     if (userSnapshot.hasError || userSnapshot.data == null) {
+            //       return const Scaffold(
+            //         body: Center(
+            //           child: Text('Failed to load user. Please try again.'),
+            //         ),
+            //       );
+            //     }
+
+            //     final userModel = userSnapshot.data!;
+            //     // WidgetsBinding.instance.addPostFrameCallback((_) {
+            //     userProvider.setUser(userModel);
+            //     // });
+            //     return userModel.role == 'organizer'
+            //         ? const Home()
+            //         : const RegularUserHome();
+            //   },
+            // );
 
             return FutureBuilder<UserModel?>(
               future: DatabaseService().getUser(uid),
               builder: (context, userSnapshot) {
                 if (userSnapshot.connectionState == ConnectionState.waiting) {
                   return Scaffold(
-                    body: Scaffold(),
+                    body: Center(
+                      child: LoadingAnimationWidget.staggeredDotsWave(
+                        color: Colors.black,
+                        size: 30.sp,
+                      ),
+                    ),
                   );
                 }
 
@@ -97,12 +134,33 @@ class MyApp extends StatelessWidget {
                 }
 
                 final userModel = userSnapshot.data!;
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  userProvider.setUser(userModel);
-                });
-                return userModel.role == 'organizer'
-                    ? const Home()
-                    : const RegularUserHome();
+
+                return Consumer<UserProvider>(
+                  builder: (context, userProvider, child) {
+                    // Set user if not already set or if different
+                    if (userProvider.user?.uid != userModel.uid) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        userProvider.setUser(userModel);
+                      });
+                    }
+
+                    // If user is not set yet, show loading
+                    if (userProvider.user == null) {
+                      return Scaffold(
+                        body: Center(
+                          child: LoadingAnimationWidget.staggeredDotsWave(
+                            color: Colors.black,
+                            size: 30.sp,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return userModel.role == 'organizer'
+                        ? const Home()
+                        : const RegularUserHome();
+                  },
+                );
               },
             );
           },
