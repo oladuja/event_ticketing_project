@@ -6,24 +6,41 @@ part 'event.g.dart';
 @JsonSerializable(explicitToJson: true)
 class EventModel {
   final String id;
-  final String title;
+  final String imageUrl;
+  final String eventName;
+  final String description;
   final String location;
+  final String eventType;
+  final String category;
+
+  @JsonKey(fromJson: _fromJson, toJson: _toJson)
   final DateTime date;
-  final int price;
+
   final int totalTickets;
   final int availableTickets;
   final List<AttendeeModel> attendees;
+  final List ticketsType;
 
   EventModel({
     required this.id,
-    required this.title,
+    required this.imageUrl,
+    required this.eventName,
+    required this.description,
     required this.location,
+    required this.eventType,
+    required this.category,
     required this.date,
-    required this.price,
     required this.totalTickets,
     required this.availableTickets,
     required this.attendees,
+    required this.ticketsType,
   });
+
+  static DateTime _fromJson(int milliseconds) =>
+      DateTime.fromMillisecondsSinceEpoch(milliseconds);
+
+  static int _toJson(DateTime dateTime) =>
+      dateTime.toUtc().millisecondsSinceEpoch;
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>
       _$EventModelFromJson(json);

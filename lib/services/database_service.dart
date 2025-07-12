@@ -1,5 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:project/models/event.dart';
 import 'package:project/models/user.dart';
+import 'package:uuid/uuid.dart';
 
 class DatabaseService {
   final DatabaseReference _db = FirebaseDatabase.instance.ref();
@@ -56,5 +58,40 @@ class DatabaseService {
     }
 
     return events;
+  }
+
+  Future<void> saveEventToDatabase({
+    required String imageUrl,
+    required String eventName,
+    required String description,
+    required String location,
+    required String eventType,
+    required String category,
+    required DateTime date,
+    required int totalTickets,
+    required List<Map<String, dynamic>> ticketsType,
+  }) async {
+    try {
+      final DatabaseReference ref = FirebaseDatabase.instance.ref("events");
+      final String eventId = const Uuid().v4();
+      final EventModel event = EventModel(
+        id: eventId,
+        imageUrl: imageUrl,
+        eventName: eventName,
+        description: description,
+        location: location,
+        eventType: eventType,
+        category: category,
+        date: date,
+        totalTickets: totalTickets,
+        availableTickets: totalTickets,
+        attendees: [],
+        ticketsType: ticketsType,
+      );
+
+      await ref.child(eventId).set(event.toJson());
+    } catch (e) {
+      rethrow;
+    }
   }
 }

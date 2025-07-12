@@ -4,7 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/web.dart';
+import 'package:project/services/database_service.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/event_details_textfield.dart';
 import 'package:toastification/toastification.dart';
@@ -26,9 +28,11 @@ class _CreateEventState extends State<CreateEvent> {
       TextEditingController();
   final TextEditingController eventAddressController = TextEditingController();
   final TextEditingController noOfTicketsController = TextEditingController();
-  File? _eventImage;
+  File? eventImage;
+  bool isLoading = false;
 
-  Future<void> uploadToUploadcare(File file) async {
+  Future<String> uploadToUploadcare(File file) async {
+    String fileUrl;
     final data = FormData.fromMap({
       'UPLOADCARE_PUB_KEY': '7438886172631afe26cb',
       'UPLOADCARE_STORE': '1',
@@ -45,15 +49,11 @@ class _CreateEventState extends State<CreateEvent> {
           },
         ),
       );
-
-      if (response.statusCode == 200) {
-        final fileUrl = "https://ucarecdn.com/${response.data['file']}/";
-        Logger().i("Uploaded successfully: $fileUrl");
-      } else {
-        Logger().e("Upload failed: ${response.statusCode}");
-      }
+      fileUrl = "https://ucarecdn.com/${response.data['file']}/";
+      Logger().i("Uploaded successfully: $fileUrl");
+      return fileUrl;
     } catch (e) {
-      Logger().e("Error uploading: $e");
+      rethrow;
     }
   }
 
@@ -76,10 +76,12 @@ class _CreateEventState extends State<CreateEvent> {
   final List<Map<String, TextEditingController>> tickets = [];
 
   void addTicketField() {
+    final nameController = TextEditingController();
+    final priceController = TextEditingController();
     setState(() {
       tickets.add({
-        'name': TextEditingController(),
-        'price': TextEditingController(),
+        'name': nameController,
+        'price': priceController,
       });
     });
   }
@@ -92,16 +94,18 @@ class _CreateEventState extends State<CreateEvent> {
 
   String? selectedEventType;
   String? selectedCategory;
-  DateTime? _selectedDateTime;
+  DateTime? selectedDateTime;
 
   Future<void> pickEventImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 15,
+    );
 
     if (pickedFile != null) {
       setState(() {
-        _eventImage = File(pickedFile.path);
+        eventImage = File(pickedFile.path);
       });
     }
   }
@@ -180,7 +184,7 @@ class _CreateEventState extends State<CreateEvent> {
                       );
                       if (pickedTime != null) {
                         setState(() {
-                          _selectedDateTime = DateTime(
+                          selectedDateTime = DateTime(
                             pickedDate.year,
                             pickedDate.month,
                             pickedDate.day,
@@ -200,13 +204,13 @@ class _CreateEventState extends State<CreateEvent> {
                             size: 20.sp, color: Colors.grey),
                         Gap(10.w),
                         Text(
-                          _selectedDateTime != null
-                              ? '${_selectedDateTime!.toLocal()}'
+                          selectedDateTime != null
+                              ? '${selectedDateTime!.toLocal()}'
                                   .split('.')
                                   .first
                               : 'Select date & time',
                           style: TextStyle(
-                            color: _selectedDateTime != null
+                            color: selectedDateTime != null
                                 ? Colors.black
                                 : Colors.grey,
                             fontSize: 15.sp,
@@ -239,14 +243,14 @@ class _CreateEventState extends State<CreateEvent> {
                           width: 2.w,
                         ),
                         borderRadius: BorderRadius.circular(5.r),
-                        image: _eventImage != null
+                        image: eventImage != null
                             ? DecorationImage(
-                                image: FileImage(_eventImage!),
+                                image: FileImage(eventImage!),
                                 fit: BoxFit.cover,
                               )
                             : null,
                       ),
-                      child: _eventImage == null
+                      child: eventImage == null
                           ? Center(
                               child: Text(
                                 'Select Event Image',
@@ -344,8 +348,10 @@ class _CreateEventState extends State<CreateEvent> {
                       padding:
                           EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                     ),
-                    child:
-                        Text('Add new', style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      'Add new',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -357,6 +363,7 @@ class _CreateEventState extends State<CreateEvent> {
                   child: Row(
                     children: [
                       Expanded(
+                        flex: 2,
                         child: TextField(
                           controller: ticket['name'],
                           cursorColor: Colors.black,
@@ -375,6 +382,7 @@ class _CreateEventState extends State<CreateEvent> {
                       ),
                       SizedBox(width: 10.w),
                       Expanded(
+                        flex: 1,
                         child: TextField(
                           controller: ticket['price'],
                           keyboardType: TextInputType.number,
@@ -402,59 +410,106 @@ class _CreateEventState extends State<CreateEvent> {
                 );
               }),
               Gap(20.h),
-              GestureDetector(
-                onTap: () {
-                  final hasValidTickets = tickets.isNotEmpty &&
-                      tickets.every((ticket) =>
-                          ticket['name']!.text.isNotEmpty &&
-                          ticket['price']!.text.isNotEmpty);
+              isLoading
+                  ? Center(
+                      child: LoadingAnimationWidget.staggeredDotsWave(
+                        color: Colors.black,
+                        size: 30.sp,
+                      ),
+                    )
+                  : GestureDetector(
+                      onTap: () async {
+                        setState(() => isLoading = true);
+                        try {
+                          final hasValidTickets = tickets.isNotEmpty &&
+                              tickets.every((ticket) =>
+                                  ticket['name']!.text.isNotEmpty &&
+                                  ticket['price']!.text.isNotEmpty);
 
-                  if (eventNameController.text.isNotEmpty &&
-                      eventDescriptionController.text.isNotEmpty &&
-                      eventAddressController.text.isNotEmpty &&
-                      noOfTicketsController.text.isNotEmpty &&
-                      selectedEventType != null &&
-                      _selectedDateTime != null &&
-                      selectedCategory != null &&
-                      _eventImage != null &&
-                      _eventImage != null &&
-                      hasValidTickets) {
-                    Navigator.of(context).pop();
-                    uploadToUploadcare(_eventImage!);
-                   
-                    showToast(
-                      'Event created successfully!',
-                      ToastificationType.success,
-                      context,
-                    );
-                  } else {
-                 
-                    showToast(
-                      'Please fill all fields before adding an event.',
-                      ToastificationType.error,
-                      context,
-                    );
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(15.w),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15.r),
-                    color: Color(0XFF518E99),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Add Event',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                          if (eventNameController.text.isNotEmpty &&
+                              eventDescriptionController.text.isNotEmpty &&
+                              eventAddressController.text.isNotEmpty &&
+                              noOfTicketsController.text.isNotEmpty &&
+                              selectedEventType != null &&
+                              selectedDateTime != null &&
+                              selectedCategory != null &&
+                              eventImage != null &&
+                              hasValidTickets) {
+                            var imageUrl =
+                                await uploadToUploadcare(eventImage!);
+
+                            await DatabaseService().saveEventToDatabase(
+                              imageUrl: imageUrl,
+                              eventName: eventNameController.value.text,
+                              description:
+                                  eventDescriptionController.value.text,
+                              location: eventAddressController.value.text,
+                              eventType: selectedEventType!,
+                              category: selectedCategory!,
+                              date: selectedDateTime!,
+                              totalTickets: int.tryParse(
+                                  noOfTicketsController.value.text)!,
+                              ticketsType: tickets.map((ticket) {
+                                return {
+                                  'name': ticket['name']!.text,
+                                  'price':
+                                      int.tryParse(ticket['price']!.text) ?? 0,
+                                };
+                              }).toList(),
+                            );
+                            if (context.mounted) {
+                              showToast(
+                                'Event created successfully!',
+                                ToastificationType.success,
+                                context,
+                              );
+                            }
+                          } else {
+                            showToast(
+                              'Please fill all fields before adding an event.',
+                              ToastificationType.error,
+                              context,
+                            );
+                          }
+                          setState(() => isLoading = false);
+                        } catch (e) {
+                          if (context.mounted) {
+                            String errorMessage =
+                                'Something went wrong. Please try again.';
+
+                            if (e.toString().contains('SocketException')) {
+                              errorMessage =
+                                  'No internet connection. Please check your network.';
+                            }
+                            showToast(
+                              errorMessage,
+                              ToastificationType.error,
+                              context,
+                            );
+                          }
+                        } finally {
+                          setState(() => isLoading = false);
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(15.w),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15.r),
+                          color: Colors.black,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Add Event',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
               Gap(20.h),
             ],
           ),

@@ -77,41 +77,7 @@ class MyApp extends StatelessWidget {
             }
 
             final uid = snapshot.data!.uid;
-            // final userProvider =
-            //     Provider.of<UserProvider>(context, listen: false);
-
-            // return FutureBuilder<UserModel?>(
-            //   future: DatabaseService().getUser(uid),
-            //   builder: (context, userSnapshot) {
-            //     if (userSnapshot.connectionState == ConnectionState.waiting) {
-            //       return Scaffold(
-            //           body: Center(
-            //         child: LoadingAnimationWidget.staggeredDotsWave(
-            //           color: Colors.black,
-            //           size: 30.sp,
-            //         ),
-            //       ));
-            //     }
-
-            //     if (userSnapshot.hasError || userSnapshot.data == null) {
-            //       return const Scaffold(
-            //         body: Center(
-            //           child: Text('Failed to load user. Please try again.'),
-            //         ),
-            //       );
-            //     }
-
-            //     final userModel = userSnapshot.data!;
-            //     // WidgetsBinding.instance.addPostFrameCallback((_) {
-            //     userProvider.setUser(userModel);
-            //     // });
-            //     return userModel.role == 'organizer'
-            //         ? const Home()
-            //         : const RegularUserHome();
-            //   },
-            // );
-
-            return FutureBuilder<UserModel?>(
+                       return FutureBuilder<UserModel?>(
               future: DatabaseService().getUser(uid),
               builder: (context, userSnapshot) {
                 if (userSnapshot.connectionState == ConnectionState.waiting) {
@@ -155,7 +121,6 @@ class MyApp extends StatelessWidget {
                         ),
                       );
                     }
-
                     return userModel.role == 'organizer'
                         ? const Home()
                         : const RegularUserHome();

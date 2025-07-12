@@ -120,7 +120,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                     ),
                     Gap(30.h),
                     Text(
-                      'Live Events',
+                      'Today Events',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -130,7 +130,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                             padding: EdgeInsets.symmetric(vertical: 30.h),
                             child: Center(
                               child: Text(
-                                'No live events at the moment',
+                                'No events at the moment',
                                 style: TextStyle(fontSize: 16.sp),
                               ),
                             ),
@@ -198,7 +198,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
             shape: CircleBorder(),
             child: FaIcon(FontAwesomeIcons.qrcode, color: Colors.white),
             backgroundColor: Colors.black,
-            onTap: () => Navigator.of(context).pushNamed(CreateEvent.routeName),
+            onTap: (){},
             label: 'Scan QR Code',
             labelStyle: TextStyle(
               fontWeight: FontWeight.w500,

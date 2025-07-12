@@ -8,25 +8,33 @@ part of 'event.dart';
 
 EventModel _$EventModelFromJson(Map<String, dynamic> json) => EventModel(
       id: json['id'] as String,
-      title: json['title'] as String,
+      imageUrl: json['imageUrl'] as String,
+      eventName: json['eventName'] as String,
+      description: json['description'] as String,
       location: json['location'] as String,
-      date: DateTime.parse(json['date'] as String),
-      price: (json['price'] as num).toInt(),
+      eventType: json['eventType'] as String,
+      category: json['category'] as String,
+      date: EventModel._fromJson((json['date'] as num).toInt()),
       totalTickets: (json['totalTickets'] as num).toInt(),
       availableTickets: (json['availableTickets'] as num).toInt(),
       attendees: (json['attendees'] as List<dynamic>)
           .map((e) => AttendeeModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      ticketsType: json['ticketsType'] as List<dynamic>,
     );
 
 Map<String, dynamic> _$EventModelToJson(EventModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'title': instance.title,
+      'imageUrl': instance.imageUrl,
+      'eventName': instance.eventName,
+      'description': instance.description,
       'location': instance.location,
-      'date': instance.date.toIso8601String(),
-      'price': instance.price,
+      'eventType': instance.eventType,
+      'category': instance.category,
+      'date': EventModel._toJson(instance.date),
       'totalTickets': instance.totalTickets,
       'availableTickets': instance.availableTickets,
       'attendees': instance.attendees.map((e) => e.toJson()).toList(),
+      'ticketsType': instance.ticketsType,
     };
