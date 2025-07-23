@@ -94,7 +94,7 @@ class MyApp extends StatelessWidget {
                 if (userSnapshot.hasError || userSnapshot.data == null) {
                   return const Scaffold(
                     body: Center(
-                      child: Text('Failed to load user. Please try again.'),
+                      child: Text('Something went wrong. Please try again.'),
                     ),
                   );
                 }
@@ -103,14 +103,12 @@ class MyApp extends StatelessWidget {
 
                 return Consumer<UserProvider>(
                   builder: (context, userProvider, child) {
-                    // Set user if not already set or if different
                     if (userProvider.user?.uid != userModel.uid) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         userProvider.setUser(userModel);
                       });
                     }
 
-                    // If user is not set yet, show loading
                     if (userProvider.user == null) {
                       return Scaffold(
                         body: Center(

@@ -18,8 +18,12 @@ class EventModel {
 
   final int totalTickets;
   final int availableTickets;
+
+  @JsonKey(fromJson: _attendeesFromJson, defaultValue: [])
   final List<AttendeeModel> attendees;
-  final List ticketsType;
+
+  @JsonKey(fromJson: _ticketsTypeFromJson, defaultValue: [])
+  final List<Map<String, dynamic>> ticketsType;
 
   EventModel({
     required this.id,
@@ -41,6 +45,20 @@ class EventModel {
 
   static int _toJson(DateTime dateTime) =>
       dateTime.toUtc().millisecondsSinceEpoch;
+
+  static List<AttendeeModel> _attendeesFromJson(dynamic json) {
+    if (json == null) return [];
+    return (json as List)
+        .map((e) => AttendeeModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  }
+
+  static List<Map<String, dynamic>> _ticketsTypeFromJson(dynamic json) {
+    if (json == null) return [];
+    return (json as List)
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+  }
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>
       _$EventModelFromJson(json);

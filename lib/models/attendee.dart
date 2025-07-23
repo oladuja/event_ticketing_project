@@ -6,13 +6,11 @@ part 'attendee.g.dart';
 class AttendeeModel {
   final String id;
   final String name;
-  final String imageUrl;
   final bool isCheckedIn;
 
   AttendeeModel({
     required this.id,
     required this.name,
-    required this.imageUrl,
     required this.isCheckedIn,
   });
 

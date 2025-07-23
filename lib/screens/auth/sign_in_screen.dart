@@ -5,8 +5,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/screens/auth/forgot_password_screen.dart';
 import 'package:project/screens/auth/sign_up_screen.dart';
 import 'package:project/screens/auth/verify_email.dart';
-import 'package:project/screens/home/organizer/organizer_home_screen.dart';
-import 'package:project/screens/home/regular_user/regular_user_home_screen.dart';
+import 'package:project/screens/home/organizer/home.dart';
+import 'package:project/screens/home/regular_user/regular_user_home.dart';
 import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
 import 'package:project/utils/show_toast.dart';
@@ -61,8 +61,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
       final userData = await DatabaseService().getUser(user!.uid);
       final route = userData?.role == 'organizer'
-          ? OrganizerHomeScreen.routeName
-          : RegularHomeScreen.routeName;
+          ? Home.routeName
+          : RegularUserHome.routeName;
 
       if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false);

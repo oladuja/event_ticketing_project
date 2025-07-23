@@ -91,14 +91,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                             return;
                           }
-
                           try {
                             await AuthService().resetPassword(
                                 _emailController.value.text.trim());
                             if (!context.mounted) return;
                             showToast(
                                 'Success! Check your email for a reset link.',
-                                ToastificationType.error,
+                                ToastificationType.success,
                                 context);
                           } catch (e) {
                             if (!mounted) return;

@@ -17,10 +17,12 @@ EventModel _$EventModelFromJson(Map<String, dynamic> json) => EventModel(
       date: EventModel._fromJson((json['date'] as num).toInt()),
       totalTickets: (json['totalTickets'] as num).toInt(),
       availableTickets: (json['availableTickets'] as num).toInt(),
-      attendees: (json['attendees'] as List<dynamic>)
-          .map((e) => AttendeeModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      ticketsType: json['ticketsType'] as List<dynamic>,
+      attendees: json['attendees'] == null
+          ? []
+          : EventModel._attendeesFromJson(json['attendees']),
+      ticketsType: json['ticketsType'] == null
+          ? []
+          : EventModel._ticketsTypeFromJson(json['ticketsType']),
     );
 
 Map<String, dynamic> _$EventModelToJson(EventModel instance) =>

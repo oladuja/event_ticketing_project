@@ -489,6 +489,9 @@ class _CreateEventState extends State<CreateEvent> {
                           }
                         } finally {
                           setState(() => isLoading = false);
+                          if (context.mounted) {
+                            Navigator.of(context).push;
+                          }
                         }
                       },
                       child: Container(
