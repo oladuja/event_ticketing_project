@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:project/models/user.dart';
+import 'package:project/services/database_service.dart';
+import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/auth_button.dart';
 import 'package:project/widgets/form_text_field.dart';
+import 'package:toastification/toastification.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:project/providers/user_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   static String routeName = '/edit_profile_screen';
@@ -14,20 +21,85 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final TextEditingController emailController = TextEditingController();
+  final DatabaseService _databaseService = DatabaseService();
+
   final TextEditingController phoneController = TextEditingController();
-  final TextEditingController businessNameController = TextEditingController();
+  final TextEditingController organizationName = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+
+  bool _saving = false;
+
+  late UserModel currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    currentUser = Provider.of<UserProvider>(context, listen: false).user!;
+    nameController.text = currentUser.name;
+    phoneController.text = currentUser.phoneNumber;
+    organizationName.text = currentUser.organizationName ?? '';
+  }
+
+  Future<void> _handleSave() async {
+    String name = nameController.text.trim();
+    String phone = phoneController.text.trim();
+    String orgName = organizationName.text.trim();
+
+    if (name.isEmpty || phone.isEmpty || orgName.isEmpty) {
+      showToast(
+        'All fields are required.',
+        ToastificationType.error,
+        context,
+      );
+      return;
+    }
+
+    setState(() => _saving = true);
+
+    try {
+      await _databaseService.updateUserProfile(
+        name: nameController.text.trim(),
+        phone: phoneController.text.trim(),
+        organizationName: organizationName.text.trim(),
+      );
+
+      final updatedUser = currentUser.copyWith(
+        name: currentUser.name,
+        phoneNumber: currentUser.phoneNumber,
+        organizationName: currentUser.organizationName,
+      );
+
+      if (!mounted) return;
+      Provider.of<UserProvider>(context, listen: false).setUser(updatedUser);
+
+      showToast(
+        'Profile updated successfully!',
+        ToastificationType.success,
+        context,
+      );
+
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (mounted) {
+        showToast(
+          'Failed to update profile.',
+          ToastificationType.error,
+          context,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 245, 245, 245),
-        title: Text(
+        title: const Text(
           'Edit Profile',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       backgroundColor: const Color.fromARGB(255, 245, 245, 245),
@@ -39,9 +111,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 Gap(10.h),
                 FormTextField(
-                  controller: emailController,
-                  hintText: 'Email Address',
-                  keyboardType: TextInputType.emailAddress,
+                  controller: nameController,
+                  hintText: 'Full Name',
+                  keyboardType: TextInputType.text,
+                ),
+                Gap(15.h),
+                FormTextField(
+                  controller: organizationName,
+                  hintText: 'Organization Name',
+                  keyboardType: TextInputType.text,
                 ),
                 Gap(15.h),
                 FormTextField(
@@ -50,16 +128,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   keyboardType: TextInputType.phone,
                 ),
                 Gap(15.h),
-                FormTextField(
-                  controller: businessNameController,
-                  hintText: 'Register business name',
-                  keyboardType: TextInputType.text,
-                ),
-                Gap(15.h),
-                AuthButton(
-                  onPressed: () => Navigator.pop(context),
-                  text: 'Done',
-                ),
+                _saving
+                    ? LoadingAnimationWidget.staggeredDotsWave(
+                        color: Colors.black,
+                        size: 30.sp,
+                      )
+                    : AuthButton(
+                        onPressed: _handleSave,
+                        text: 'Done',
+                      ),
               ],
             ),
           ),

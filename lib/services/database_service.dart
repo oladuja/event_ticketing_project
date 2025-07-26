@@ -1,11 +1,12 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:logger/logger.dart';
 import 'package:project/models/event.dart';
 import 'package:project/models/user.dart';
 import 'package:uuid/uuid.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DatabaseService {
   final DatabaseReference _db = FirebaseDatabase.instance.ref();
+  final _auth = FirebaseAuth.instance;
 
   Future<void> saveUser(UserModel user) async {
     try {
@@ -73,6 +74,7 @@ class DatabaseService {
     required String description,
     required String location,
     required String eventType,
+    required String organizerId,
     required String category,
     required DateTime date,
     required int totalTickets,
@@ -94,6 +96,7 @@ class DatabaseService {
         availableTickets: totalTickets,
         attendees: [],
         ticketsType: ticketsType,
+        organizerId: organizerId,
       );
 
       await ref.child(eventId).set(event.toJson());
@@ -127,15 +130,55 @@ class DatabaseService {
 
         events.sort((a, b) => a.date.compareTo(b.date));
       }
-
-      Logger().d(events.length);
-      for (var event in events) {
-        Logger().d(event.toJson());
-      }
-
       return events;
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<void> updateEventInDatabase(EventModel event) async {
+    try {
+      await _db.child('events').child(event.id).update(event.toJson());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteEventFromDatabase(String eventId) async {
+    try {
+      await _db.child('events').child(eventId).remove();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getCurrentUserProfile() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return null;
+
+    final snapshot = await _db.child('users/$uid').get();
+
+    if (snapshot.exists) {
+      return Map<String, dynamic>.from(snapshot.value as Map);
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> updateUserProfile({
+    required String name,
+    required String phone,
+    required String organizationName,
+  }) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) throw Exception('User not authenticated');
+
+    final ref = _db.child('users/$uid');
+
+    await ref.update({
+      'name': name,
+      'phone': phone,
+      'organizationName': organizationName,
+    });
   }
 }

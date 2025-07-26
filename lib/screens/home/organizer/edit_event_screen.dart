@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:project/models/event.dart';
+import 'package:project/services/database_service.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/event_details_textfield.dart';
 import 'package:toastification/toastification.dart';
 
 class EditEvent extends StatefulWidget {
   static String routeName = '/edit_event';
+  final EventModel event;
 
-  const EditEvent({super.key});
+  const EditEvent({super.key, required this.event});
 
   @override
   State<EditEvent> createState() => _EditEventState();
@@ -38,8 +41,20 @@ class _EditEventState extends State<EditEvent> {
 
   String? selectedEventType;
   String? selectedCategory;
-
   DateTime? _selectedDateTime;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final event = widget.event;
+    eventNameController.text = event.eventName;
+    eventDescriptionController.text = event.description;
+    eventAddressController.text = event.location;
+    selectedEventType = event.eventType;
+    selectedCategory = event.category;
+    _selectedDateTime = event.date;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +63,11 @@ class _EditEventState extends State<EditEvent> {
         backgroundColor: const Color.fromARGB(255, 245, 245, 245),
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
-        title: Text(
+        title: const Text(
           'Edit Event',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       backgroundColor: const Color.fromARGB(255, 245, 245, 245),
@@ -65,23 +78,18 @@ class _EditEventState extends State<EditEvent> {
             children: [
               EventDetailsField(
                 title: 'Event Type',
-                child: DropdownButtonFormField(
-                  items: [
-                    ...eventTypes.map(
-                      (type) => DropdownMenuItem(
-                        onTap: () => selectedEventType = type,
-                        key: ValueKey(type),
-                        value: type,
-                        child: Text(type),
-                      ),
-                    ),
-                  ],
-                  decoration: InputDecoration(
-                    enabledBorder: InputBorder.none,
-                    border: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                  ),
-                  onChanged: (_) {},
+                child: DropdownButtonFormField<String>(
+                  value: selectedEventType,
+                  items: eventTypes
+                      .map((type) =>
+                          DropdownMenuItem(value: type, child: Text(type)))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedEventType = value;
+                    });
+                  },
+                  decoration: const InputDecoration(border: InputBorder.none),
                 ),
               ),
               EventDetailsField(
@@ -89,12 +97,7 @@ class _EditEventState extends State<EditEvent> {
                 child: TextField(
                   controller: eventNameController,
                   cursorColor: Colors.black,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    enabledBorder: InputBorder.none,
-                    border: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                  ),
+                  decoration: const InputDecoration(border: InputBorder.none),
                 ),
               ),
               EventDetailsField(
@@ -103,7 +106,7 @@ class _EditEventState extends State<EditEvent> {
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
                       context: context,
-                      initialDate: DateTime.now(),
+                      initialDate: _selectedDateTime ?? DateTime.now(),
                       firstDate: DateTime.now(),
                       lastDate: DateTime(2099),
                     );
@@ -158,33 +161,23 @@ class _EditEventState extends State<EditEvent> {
                   controller: eventDescriptionController,
                   maxLines: 3,
                   cursorColor: Colors.black,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    enabledBorder: InputBorder.none,
-                    border: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                  ),
+                  decoration: const InputDecoration(border: InputBorder.none),
                 ),
               ),
               EventDetailsField(
                 title: 'Category',
-                child: DropdownButtonFormField(
-                  items: [
-                    ...categories.map(
-                      (category) => DropdownMenuItem(
-                        onTap: () => selectedCategory = category,
-                        key: ValueKey(category),
-                        value: category,
-                        child: Text(category),
-                      ),
-                    ),
-                  ],
-                  decoration: InputDecoration(
-                    enabledBorder: InputBorder.none,
-                    border: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                  ),
-                  onChanged: (_) {},
+                child: DropdownButtonFormField<String>(
+                  value: selectedCategory,
+                  items: categories
+                      .map((cat) =>
+                          DropdownMenuItem(value: cat, child: Text(cat)))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCategory = value;
+                    });
+                  },
+                  decoration: const InputDecoration(border: InputBorder.none),
                 ),
               ),
               EventDetailsField(
@@ -192,34 +185,50 @@ class _EditEventState extends State<EditEvent> {
                 child: TextField(
                   controller: eventAddressController,
                   cursorColor: Colors.black,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    enabledBorder: InputBorder.none,
-                    border: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                  ),
+                  decoration: const InputDecoration(border: InputBorder.none),
                 ),
               ),
               Gap(20.h),
               GestureDetector(
-                onTap: () {
+                onTap: () async {
                   if (eventNameController.text.isNotEmpty &&
                       eventDescriptionController.text.isNotEmpty &&
                       eventAddressController.text.isNotEmpty &&
                       selectedEventType != null &&
                       _selectedDateTime != null &&
                       selectedCategory != null) {
-                    Navigator.of(context).pop();
-                 
-                    showToast(
-                      'Event updated successfully!',
-                      ToastificationType.success,
-                      context,
+                    final updatedEvent = widget.event.copyWith(
+                      eventName: eventNameController.text.trim(),
+                      description: eventDescriptionController.text.trim(),
+                      location: eventAddressController.text.trim(),
+                      eventType: selectedEventType!,
+                      category: selectedCategory!,
+                      date: _selectedDateTime!,
                     );
+
+                    try {
+                      await DatabaseService()
+                          .updateEventInDatabase(updatedEvent);
+                      if (context.mounted) {
+                        Navigator.of(context).pop(true);
+                        showToast(
+                          'Event updated successfully!',
+                          ToastificationType.success,
+                          context,
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        showToast(
+                          'Failed to update event.',
+                          ToastificationType.error,
+                          context,
+                        );
+                      }
+                    }
                   } else {
-                
                     showToast(
-                      'Please fill all fields before adding an event.',
+                      'Please fill all fields before updating the event.',
                       ToastificationType.error,
                       context,
                     );
@@ -230,7 +239,7 @@ class _EditEventState extends State<EditEvent> {
                   padding: EdgeInsets.all(15.w),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.r),
-                    color: Color(0XFF518E99),
+                    color: Colors.black,
                   ),
                   child: Center(
                     child: Text(

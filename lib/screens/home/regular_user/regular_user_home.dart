@@ -15,15 +15,20 @@ class RegularUserHome extends StatefulWidget {
 
 class _RegularUserHomeState extends State<RegularUserHome> {
   int selectedPageIndex = 0;
-  final List<Widget> pages = [
+
+  final List<Widget> pages = const [
     RegularHomeScreen(),
     ListOfEventScreeen(),
     UserProfileScreen(),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[selectedPageIndex],
+      body: IndexedStack(
+        index: selectedPageIndex,
+        children: pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         selectedLabelStyle:
             TextStyle(fontSize: 9.sp, fontWeight: FontWeight.bold),

@@ -12,6 +12,7 @@ class EventModel {
   final String location;
   final String eventType;
   final String category;
+  final String organizerId;
 
   @JsonKey(fromJson: _fromJson, toJson: _toJson)
   final DateTime date;
@@ -37,8 +38,41 @@ class EventModel {
     required this.totalTickets,
     required this.availableTickets,
     required this.attendees,
+    required this.organizerId,
     required this.ticketsType,
   });
+
+  EventModel copyWith({
+    String? id,
+    String? imageUrl,
+    String? eventName,
+    String? description,
+    String? location,
+    String? eventType,
+    String? organizerId,
+    String? category,
+    DateTime? date,
+    int? totalTickets,
+    int? availableTickets,
+    List<AttendeeModel>? attendees,
+    List<Map<String, dynamic>>? ticketsType,
+  }) {
+    return EventModel(
+      id: id ?? this.id,
+      imageUrl: imageUrl ?? this.imageUrl,
+      eventName: eventName ?? this.eventName,
+      description: description ?? this.description,
+      location: location ?? this.location,
+      eventType: eventType ?? this.eventType,
+      category: category ?? this.category,
+      date: date ?? this.date,
+      totalTickets: totalTickets ?? this.totalTickets,
+      organizerId: organizerId ?? this.organizerId,
+      availableTickets: availableTickets ?? this.availableTickets,
+      attendees: attendees ?? this.attendees,
+      ticketsType: ticketsType ?? this.ticketsType,
+    );
+  }
 
   static DateTime _fromJson(int milliseconds) =>
       DateTime.fromMillisecondsSinceEpoch(milliseconds);
@@ -55,9 +89,7 @@ class EventModel {
 
   static List<Map<String, dynamic>> _ticketsTypeFromJson(dynamic json) {
     if (json == null) return [];
-    return (json as List)
-        .map((e) => Map<String, dynamic>.from(e))
-        .toList();
+    return (json as List).map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>

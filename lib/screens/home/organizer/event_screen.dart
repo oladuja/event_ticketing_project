@@ -7,7 +7,9 @@ import 'package:project/models/event.dart';
 import 'package:project/screens/home/organizer/attendees_screen.dart';
 import 'package:project/screens/home/organizer/edit_event_screen.dart';
 import 'package:project/services/database_service.dart';
+import 'package:project/utils/show_toast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:toastification/toastification.dart';
 
 class EventScreen extends StatefulWidget {
   static String routeName = '/event_screen';
@@ -139,11 +141,57 @@ class _EventScreenState extends State<EventScreen>
           trailing: PopupMenuButton<String>(
             color: Colors.white,
             icon: const FaIcon(Icons.more_vert, color: Colors.black),
-            onSelected: (value) {
+            onSelected: (value) async {
               if (value == 'edit') {
-                Navigator.of(context).pushNamed(EditEvent.routeName);
+                final shouldRefresh = await Navigator.of(context).push<bool>(
+                  MaterialPageRoute(
+                    builder: (_) => EditEvent(event: event),
+                  ),
+                );
+
+                if (shouldRefresh == true) {
+                  _loadEvents();
+                }
               } else if (value == 'delete') {
-                // Handle delete action
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Delete Event'),
+                    content: const Text(
+                        'Are you sure you want to delete this event?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirmed == true) {
+                  try {
+                    await _databaseService.deleteEventFromDatabase(event.id);
+                    setState(() {
+                      _events.removeWhere((e) => e.id == event.id);
+                    });
+                    if (!mounted) return;
+
+                    showToast('Event deleted successfully',
+                        ToastificationType.success, context);
+                  } catch (e) {
+                    if (!mounted) return;
+
+                    showToast('Failed to delete event',
+                        ToastificationType.error, context);
+                  }
+                }
               }
             },
             itemBuilder: (context) => const [

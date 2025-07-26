@@ -20,6 +20,7 @@ EventModel _$EventModelFromJson(Map<String, dynamic> json) => EventModel(
       attendees: json['attendees'] == null
           ? []
           : EventModel._attendeesFromJson(json['attendees']),
+      organizerId: json['organizerId'] as String,
       ticketsType: json['ticketsType'] == null
           ? []
           : EventModel._ticketsTypeFromJson(json['ticketsType']),
@@ -34,6 +35,7 @@ Map<String, dynamic> _$EventModelToJson(EventModel instance) =>
       'location': instance.location,
       'eventType': instance.eventType,
       'category': instance.category,
+      'organizerId': instance.organizerId,
       'date': EventModel._toJson(instance.date),
       'totalTickets': instance.totalTickets,
       'availableTickets': instance.availableTickets,

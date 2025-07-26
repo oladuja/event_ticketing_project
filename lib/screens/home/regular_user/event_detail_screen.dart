@@ -8,40 +8,50 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:project/models/event.dart';
 
 class EventDetailScreen extends StatefulWidget {
   static String routeName = 'event_details_screen';
-  const EventDetailScreen({super.key, required this.tag});
+  const EventDetailScreen({super.key, required this.tag, required this.event});
 
   final dynamic tag;
+  final EventModel event;
 
   @override
   State<EventDetailScreen> createState() => _EventDetailScreenState();
 }
 
 class _EventDetailScreenState extends State<EventDetailScreen> {
-  final Map<String, int> ticketPrices = {
-    'Regular': 2000,
-    'VIP': 2500,
-    'VVIP': 3000,
-    'TF2': 3500,
-    'TF8': 4000,
-    'TF12': 4000,
-  };
-
-  String selectedTicket = 'Regular';
+  String selectedTicket = '';
   int quantity = 1;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.event.ticketsType.isNotEmpty) {
+      selectedTicket = widget.event.ticketsType.first['name'] ?? '';
+    }
+  }
+
+  double _getPriceForSelectedTicket() {
+    final ticket = widget.event.ticketsType.firstWhere(
+      (t) => t['name'] == selectedTicket,
+      orElse: () => {'price': 0},
+    );
+    return double.tryParse(ticket['price'].toString()) ?? 0;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final price = _getPriceForSelectedTicket();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Event Details',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -55,15 +65,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   width: double.infinity,
                   height: 200.h,
                   decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(15.r)
-                      // image: DecorationImage(image: AssetImage())
-                      ),
+                    borderRadius: BorderRadius.circular(15.r),
+                    image: DecorationImage(
+                      image: NetworkImage(widget.event.imageUrl),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
               Gap(15.h),
               Text(
-                'Made for more Conference',
+                widget.event.eventName,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.sp,
@@ -71,81 +83,66 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               Gap(5.h),
               Text(
-                'Category - Technology',
+                'Category - ${widget.event.category}',
                 style: TextStyle(fontSize: 14.sp, color: Colors.black54),
               ),
               Gap(5.h),
               Row(
                 children: [
-                  FaIcon(
-                    FontAwesomeIcons.calendar,
-                    size: 16.sp,
-                  ),
+                  FaIcon(FontAwesomeIcons.calendar, size: 16.sp),
                   Gap(8.w),
                   Text(
-                    DateFormat.yMEd().add_jms().format(DateTime.now()),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    DateFormat.yMEd().add_jms().format(widget.event.date),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               Gap(5.h),
               Row(
                 children: [
-                  FaIcon(
-                    FontAwesomeIcons.locationPin,
-                    size: 16.sp,
-                  ),
+                  FaIcon(FontAwesomeIcons.locationPin, size: 16.sp),
                   Gap(8.w),
                   Text(
-                    'FUTA North Gate, Nigeria',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    widget.event.location,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               Gap(10.h),
               Row(
                 children: [
-                  FaIcon(
-                    FontAwesomeIcons.ticket,
-                    size: 16.sp,
-                  ),
+                  FaIcon(FontAwesomeIcons.ticket, size: 16.sp),
                   Gap(8.w),
                   Text(
-                    '100 Ticket(s) Left',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    '${widget.event.availableTickets} Ticket(s) Left',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               Gap(10.h),
               Row(
                 children: [
-                  FaIcon(
-                    FontAwesomeIcons.userGroup,
-                    size: 16.sp,
-                  ),
+                  FaIcon(FontAwesomeIcons.userGroup, size: 16.sp),
                   Gap(8.w),
-                  Text(
-                    'Organized By Temi',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  // const Text(
+                  //   'Organized By ${widget.event.}', 
+                  //   style: TextStyle(fontWeight: FontWeight.bold),
+                  // ),
                 ],
               ),
               Gap(10.h),
               Wrap(
                 spacing: 8.h,
-                children: ticketPrices.keys.map((ticket) {
+                children: widget.event.ticketsType.map<Widget>((ticket) {
+                  final name = ticket['name'];
                   return ChoiceChip(
                     selectedColor:
-                        Color(0xFF518E99).withAlpha((0.3 * 255).toInt()),
-                    label: Text(ticket),
-                    selected: selectedTicket == ticket,
+                        const Color(0xFF518E99).withAlpha((0.3 * 255).toInt()),
+                    label: Text(name),
+                    selected: selectedTicket == name,
                     onSelected: (_) {
                       setState(() {
-                        selectedTicket = ticket;
+                        selectedTicket = name;
                       });
                     },
                   );
@@ -153,7 +150,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               Gap(10.h),
               Text(
-                '₦${ticketPrices[selectedTicket]!.toStringAsFixed(2)}',
+                '₦${price.toStringAsFixed(2)}',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
               ),
               Gap(8.h),
@@ -167,15 +164,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     child: Row(
                       children: [
                         IconButton(
-                          icon: FaIcon(
-                            FontAwesomeIcons.minus,
-                            size: 16.sp,
-                          ),
+                          icon: FaIcon(FontAwesomeIcons.minus, size: 16.sp),
                           onPressed: () {
                             if (quantity > 1) {
-                              setState(() {
-                                quantity--;
-                              });
+                              setState(() => quantity--);
                             }
                           },
                         ),
@@ -185,14 +177,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               fontWeight: FontWeight.bold, fontSize: 16.sp),
                         ),
                         IconButton(
-                          icon: FaIcon(
-                            FontAwesomeIcons.plus,
-                            size: 16.sp,
-                          ),
+                          icon: FaIcon(FontAwesomeIcons.plus, size: 16.sp),
                           onPressed: () {
-                            setState(() {
-                              quantity++;
-                            });
+                            setState(() => quantity++);
                           },
                         ),
                       ],
@@ -203,33 +190,37 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     onPressed: () async {
                       try {
                         final Customer customer = Customer(
-                            name: "Flutterwave Developer",
-                            phoneNumber: "1234566677777",
-                            email: "customer@customer.com");
+                          name: "Flutterwave Developer",
+                          phoneNumber: "1234566677777",
+                          email: "customer@customer.com",
+                        );
+
                         final Flutterwave flutterwave = Flutterwave(
-                            publicKey:
-                                "FLWPUBK_TEST-8248fd5f2c301eed1e7ddc771d83a43d-X",
-                            currency: "NGN",
-                            redirectUrl: "https://google.com",
-                            txRef: DateTime.now().toString(),
-                            amount: "100",
-                            customer: customer,
-                            paymentOptions: "card",
-                            customization: Customization(
-                                title: 'Pay Now', description: 'Pay Now'),
-                            isTestMode: true);
+                          publicKey:
+                              "FLWPUBK_TEST-8248fd5f2c301eed1e7ddc771d83a43d-X",
+                          currency: "NGN",
+                          redirectUrl: "https://google.com",
+                          txRef: DateTime.now().toIso8601String(),
+                          amount: (price * quantity).toStringAsFixed(2),
+                          customer: customer,
+                          paymentOptions: "card",
+                          customization: Customization(
+                            title: 'Pay Now',
+                            description: 'Pay Now',
+                          ),
+                          isTestMode: true,
+                        );
 
                         final ChargeResponse response =
                             await flutterwave.charge(context);
 
-                        Logger().d(
-                          "Payment successful: ${response.toJson()}",
-                        );
+                        Logger().d("Payment result: ${response.toJson()}");
+
                         if (response.status == 'successful') {
-                          // Perform some things in the database
+                          // Optionally: Update database (e.g., reduce ticket count, register user, etc.)
                         }
                       } catch (e) {
-                        debugPrint(e.toString());
+                        debugPrint('Payment error: $e');
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -238,7 +229,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Buy Now',
                       style: TextStyle(color: Colors.white),
                     ),
@@ -255,12 +246,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               Gap(5.h),
               Text(
-                'Lorem Ipsum is simply dummy text of the printing  typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop software like Aldus PageMaker including versions of Lorem Ipsum.',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                ),
+                widget.event.description,
+                style: TextStyle(fontSize: 14.sp),
                 textAlign: TextAlign.justify,
               ),
+              Gap(20.h),
             ],
           ),
         ),

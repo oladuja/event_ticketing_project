@@ -9,7 +9,6 @@ import 'package:project/screens/auth/sign_in_screen.dart';
 import 'package:project/screens/auth/sign_up_screen.dart';
 import 'package:project/screens/home/regular_user/list_of_event_screeen.dart';
 import 'package:project/screens/home/organizer/create_event.dart';
-import 'package:project/screens/home/organizer/edit_event_screen.dart';
 import 'package:project/screens/home/organizer/edit_profile.dart';
 import 'package:project/screens/home/organizer/event_screen.dart';
 import 'package:project/screens/home/organizer/home.dart';
@@ -57,14 +56,12 @@ class MyApp extends StatelessWidget {
           CreateEvent.routeName: (_) => const CreateEvent(),
           Home.routeName: (_) => const Home(),
           EventScreen.routeName: (_) => const EventScreen(),
-          EditEvent.routeName: (_) => const EditEvent(),
           ProfileScreen.routeName: (_) => const ProfileScreen(),
           EditProfileScreen.routeName: (_) => const EditProfileScreen(),
           RegularUserHome.routeName: (_) => const RegularUserHome(),
           RegularHomeScreen.routeName: (_) => const RegularHomeScreen(),
           ListOfEventScreeen.routeName: (_) => const ListOfEventScreeen(),
         },
-        // initialRoute: SignInScreen.routeName,
         home: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {

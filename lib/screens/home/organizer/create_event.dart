@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:logger/web.dart';
+
+import 'package:project/screens/home/organizer/home.dart';
+import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/event_details_textfield.dart';
+
 import 'package:toastification/toastification.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -31,6 +34,11 @@ class _CreateEventState extends State<CreateEvent> {
   File? eventImage;
   bool isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   Future<String> uploadToUploadcare(File file) async {
     String fileUrl;
     final data = FormData.fromMap({
@@ -50,7 +58,6 @@ class _CreateEventState extends State<CreateEvent> {
         ),
       );
       fileUrl = "https://ucarecdn.com/${response.data['file']}/";
-      Logger().i("Uploaded successfully: $fileUrl");
       return fileUrl;
     } catch (e) {
       rethrow;
@@ -108,6 +115,19 @@ class _CreateEventState extends State<CreateEvent> {
         eventImage = File(pickedFile.path);
       });
     }
+  }
+
+  @override
+  dispose() {
+    eventNameController.dispose();
+    eventDescriptionController.dispose();
+    eventAddressController.dispose();
+    noOfTicketsController.dispose();
+    selectedEventType = null;
+    selectedCategory = null;
+    selectedDateTime = null;
+    eventImage = null;
+    super.dispose();
   }
 
   @override
@@ -447,6 +467,7 @@ class _CreateEventState extends State<CreateEvent> {
                               eventType: selectedEventType!,
                               category: selectedCategory!,
                               date: selectedDateTime!,
+                              organizerId: AuthService().currentUser!.uid,
                               totalTickets: int.tryParse(
                                   noOfTicketsController.value.text)!,
                               ticketsType: tickets.map((ticket) {
@@ -490,7 +511,12 @@ class _CreateEventState extends State<CreateEvent> {
                         } finally {
                           setState(() => isLoading = false);
                           if (context.mounted) {
-                            Navigator.of(context).push;
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (context) => const Home(),
+                              ),
+                              (route) => false,
+                            );
                           }
                         }
                       },

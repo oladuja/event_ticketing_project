@@ -11,6 +11,7 @@ class AuthException implements Exception {
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+ 
   Future<UserCredential> signUp({
     required String email,
     required String password,
