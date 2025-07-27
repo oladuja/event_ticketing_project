@@ -6,8 +6,10 @@ import 'package:project/screens/home/organizer/edit_profile.dart';
 import 'package:project/screens/home/organizer/privacy_screen.dart';
 import 'package:project/screens/home/organizer/tc_screen.dart';
 import 'package:project/services/auth_service.dart';
+import 'package:project/providers/user_provider.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/profile_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 class UserProfileScreen extends StatelessWidget {
@@ -15,6 +17,8 @@ class UserProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -73,7 +77,6 @@ class UserProfileScreen extends StatelessWidget {
                 ),
               ),
               Gap(20.h),
-              // ProfileWc
               ProfileWidget(
                 text: 'Privacy Policy',
                 onTap: () => Navigator.of(context).push(
@@ -106,6 +109,7 @@ class UserProfileScreen extends StatelessWidget {
                 onTap: () async {
                   try {
                     await AuthService().signOut();
+                    userProvider.clearUser();
                   } catch (e) {
                     if (!context.mounted) return;
                     showToast(

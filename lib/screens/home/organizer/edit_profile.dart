@@ -58,15 +58,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       await _databaseService.updateUserProfile(
-        name: nameController.text.trim(),
-        phone: phoneController.text.trim(),
-        organizationName: organizationName.text.trim(),
+        name: name,
+        phone: phone,
+        organizationName: orgName,
       );
 
       final updatedUser = currentUser.copyWith(
-        name: currentUser.name,
-        phoneNumber: currentUser.phoneNumber,
-        organizationName: currentUser.organizationName,
+        name: name,
+        phoneNumber: phone,
+        organizationName: orgName,
       );
 
       if (!mounted) return;

@@ -80,16 +80,18 @@ class EventModel {
   static int _toJson(DateTime dateTime) =>
       dateTime.toUtc().millisecondsSinceEpoch;
 
-  static List<AttendeeModel> _attendeesFromJson(dynamic json) {
-    if (json == null) return [];
-    return (json as List)
-        .map((e) => AttendeeModel.fromJson(Map<String, dynamic>.from(e)))
-        .toList();
-  }
+static List<AttendeeModel> _attendeesFromJson(dynamic json) {
+  if (json == null) return [];
+
+  final map = Map<String, dynamic>.from(json);
+  return map.entries
+      .map((entry) => AttendeeModel.fromJson(Map<String, dynamic>.from(entry.value)))
+      .toList();
+}
 
   static List<Map<String, dynamic>> _ticketsTypeFromJson(dynamic json) {
     if (json == null) return [];
-    return (json as List).map((e) => Map<String, dynamic>.from(e)).toList();
+    return (json as List).map((v) => Map<String, dynamic>.from(v)).toList();
   }
 
   factory EventModel.fromJson(Map<String, dynamic> json) =>

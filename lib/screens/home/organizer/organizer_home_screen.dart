@@ -88,14 +88,15 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Welcome back',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            overflow: TextOverflow.visible,
+        title: Consumer<UserProvider>(
+          builder: (_, user, child) => Text(
+            'Welcome back, ${user.user!.name}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              overflow: TextOverflow.visible,
+            ),
           ),
         ),
         backgroundColor: const Color.fromARGB(255, 245, 245, 245),

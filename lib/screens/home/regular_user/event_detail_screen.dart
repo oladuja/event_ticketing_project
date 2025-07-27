@@ -7,8 +7,10 @@ import 'package:flutterwave_standard/models/responses/charge_response.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
 import 'package:project/models/event.dart';
+import 'package:project/models/user.dart';
+import 'package:project/services/auth_service.dart';
+import 'package:project/services/database_service.dart';
 
 class EventDetailScreen extends StatefulWidget {
   static String routeName = 'event_details_screen';
@@ -124,10 +126,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 children: [
                   FaIcon(FontAwesomeIcons.userGroup, size: 16.sp),
                   Gap(8.w),
-                  // const Text(
-                  //   'Organized By ${widget.event.}', 
-                  //   style: TextStyle(fontWeight: FontWeight.bold),
-                  // ),
+                  FutureBuilder<UserModel?>(
+                    future: DatabaseService()
+                        .getOrganizerById(widget.event.organizerId),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Container();
+                      } else if (!snapshot.hasData || snapshot.data == null) {
+                        return Container();
+                      } else {
+                        final organizer = snapshot.data!;
+                        return Text("Organized by: ${organizer.name}");
+                      }
+                    },
+                  )
                 ],
               ),
               Gap(10.h),
@@ -213,11 +225,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
                         final ChargeResponse response =
                             await flutterwave.charge(context);
-
-                        Logger().d("Payment result: ${response.toJson()}");
-
                         if (response.status == 'successful') {
-                          // Optionally: Update database (e.g., reduce ticket count, register user, etc.)
+                          await DatabaseService().handleSuccessfulPurchase(
+                            event: widget.event,
+                            ticketsBought: 2,
+                            ticketPrice: 5000.0,
+                            buyerId: AuthService().currentUser!.uid,
+                          );
                         }
                       } catch (e) {
                         debugPrint('Payment error: $e');

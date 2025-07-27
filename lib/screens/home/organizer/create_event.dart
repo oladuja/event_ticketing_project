@@ -5,13 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-
 import 'package:project/screens/home/organizer/home.dart';
 import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/event_details_textfield.dart';
-
 import 'package:toastification/toastification.dart';
 import 'package:image_picker/image_picker.dart';
 

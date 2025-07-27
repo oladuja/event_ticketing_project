@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:project/models/event.dart';
 import 'package:project/screens/home/regular_user/event_detail_screen.dart';
 import 'package:project/services/database_service.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ListOfEventScreeen extends StatefulWidget {
   static String routeName = '/list_of_event_screen';
@@ -17,6 +19,8 @@ class ListOfEventScreeen extends StatefulWidget {
 class _ListOfEventScreeenState extends State<ListOfEventScreeen>
     with AutomaticKeepAliveClientMixin {
   final DatabaseService _databaseService = DatabaseService();
+  final RefreshController _refreshController = RefreshController();
+
   List<EventModel> _events = [];
   bool _loading = true;
 
@@ -36,7 +40,7 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
       events.sort((a, b) => a.date.compareTo(b.date));
       setState(() => _events = events);
     } catch (e) {
-      debugPrint('Error fetching events: $e');
+      Logger().e('Error fetching events: $e');
     } finally {
       setState(() => _loading = false);
     }
@@ -44,6 +48,7 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
 
   Future<void> _onRefresh() async {
     await _fetchEvents();
+    _refreshController.refreshCompleted();
   }
 
   @override
@@ -65,8 +70,19 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
                 size: 30.sp,
               ),
             )
-          : RefreshIndicator(
+          : SmartRefresher(
+              controller: _refreshController,
               onRefresh: _onRefresh,
+              header: CustomHeader(
+                builder: (context, mode) {
+                  return Center(
+                    child: LoadingAnimationWidget.staggeredDotsWave(
+                      color: Colors.black,
+                      size: 30.sp,
+                    ),
+                  );
+                },
+              ),
               child: _events.isEmpty
                   ? ListView(
                       children: [

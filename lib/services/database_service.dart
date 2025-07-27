@@ -1,8 +1,10 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:project/models/attendee.dart';
 import 'package:project/models/event.dart';
+import 'package:project/models/ticket.dart';
 import 'package:project/models/user.dart';
-import 'package:uuid/uuid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project/services/auth_service.dart';
 
 class DatabaseService {
   final DatabaseReference _db = FirebaseDatabase.instance.ref();
@@ -34,11 +36,13 @@ class DatabaseService {
     try {
       final snapshot = await _db.child('users').child(uid).get();
       if (snapshot.exists) {
-        final data = snapshot.value as Map;
+        final data = Map<String, dynamic>.from(snapshot.value as Map);
+
+        final user = UserModel.fromJson(Map<String, dynamic>.from(data));
         return {
-          'totalCommission': data['totalCommission'] ?? 0,
-          'totalEventsCreated': data['totalEventsCreated'] ?? 0,
-          'ticketsSold': data['ticketsSold'] ?? 0,
+          'totalCommission': user.totalCommission?? 0,
+          'totalEventsCreated':user.totalEventsCreated ?? 0,
+          'ticketsSold': user.ticketsSold ?? 0,
         };
       } else {
         return {
@@ -81,8 +85,10 @@ class DatabaseService {
     required List<Map<String, dynamic>> ticketsType,
   }) async {
     try {
-      final DatabaseReference ref = FirebaseDatabase.instance.ref("events");
-      final String eventId = const Uuid().v4();
+      final DatabaseReference ref = _db.child("events");
+      final organizerRef = _db.child('users/${AuthService().currentUser?.uid}');
+      final newEventRef = ref.push();
+      final String eventId = newEventRef.key!;
       final EventModel event = EventModel(
         id: eventId,
         imageUrl: imageUrl,
@@ -98,8 +104,15 @@ class DatabaseService {
         ticketsType: ticketsType,
         organizerId: organizerId,
       );
+      final snapshot = await organizerRef.get();
+      final user =
+          UserModel.fromJson(Map<String, dynamic>.from(snapshot.value as Map));
+      final updatedUser = user.copyWith(
+        totalEventsCreated: user.totalEventsCreated! + 1,
+      );
 
-      await ref.child(eventId).set(event.toJson());
+      await organizerRef.set(updatedUser.toJson());
+      await newEventRef.set(event.toJson());
     } catch (e) {
       rethrow;
     }
@@ -152,33 +165,123 @@ class DatabaseService {
     }
   }
 
-  Future<Map<String, dynamic>?> getCurrentUserProfile() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return null;
+  // Future<Map<String, dynamic>?> getCurrentUserProfile() async {
+  //   try {
+  //     final uid = _auth.currentUser?.uid;
+  //     if (uid == null) return null;
 
-    final snapshot = await _db.child('users/$uid').get();
+  //     final snapshot = await _db.child('users/$uid').get();
 
-    if (snapshot.exists) {
-      return Map<String, dynamic>.from(snapshot.value as Map);
-    } else {
-      return null;
-    }
-  }
+  //     if (snapshot.exists) {
+  //       return Map<String, dynamic>.from(snapshot.value as Map);
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 
   Future<void> updateUserProfile({
     required String name,
     required String phone,
     required String organizationName,
   }) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) throw Exception('User not authenticated');
+    try {
+      final uid = _auth.currentUser?.uid;
+      if (uid == null) throw Exception('User not authenticated');
 
-    final ref = _db.child('users/$uid');
+      final ref = _db.child('users/$uid');
 
-    await ref.update({
-      'name': name,
-      'phone': phone,
-      'organizationName': organizationName,
-    });
+      await ref.update({
+        'name': name,
+        'phone': phone,
+        'organizationName': organizationName,
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<UserModel?> getOrganizerById(String organizerId) async {
+    try {
+      final snapshot = await _db.child('users/$organizerId').get();
+      if (snapshot.exists) {
+        final data = Map<String, dynamic>.from(snapshot.value as Map);
+        return UserModel.fromJson(data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> handleSuccessfulPurchase({
+    required EventModel event,
+    required int ticketsBought,
+    required double ticketPrice,
+    required String buyerId,
+  }) async {
+    try {
+      final eventRef = _db.child('events/${event.id}');
+      final attendeesRef = eventRef.child('attendees');
+      final organizerRef = _db.child('users/${event.organizerId}');
+      final buyerTicketsRef = _db.child('tickets/$buyerId');
+
+
+
+      if (event.availableTickets < ticketsBought) {
+        throw Exception('Not enough tickets available');
+      }
+
+      final newAttendeeRef = attendeesRef.push();
+      final attendeeId = newAttendeeRef.key!;
+      final attendee = AttendeeModel(
+        id: attendeeId,
+        uid: buyerId,
+        ticketsBought: ticketsBought,
+        timestamp: DateTime.now(),
+        isChecked: false,
+      );
+      await newAttendeeRef.set(attendee.toJson());
+
+      await eventRef.update({
+        'availableTickets': event.availableTickets - ticketsBought,
+      });
+
+      final organizerSnapshot = await organizerRef.get();
+      if (!organizerSnapshot.exists) {
+        throw Exception('Organizer not found');
+      }
+
+      final userModel = UserModel.fromJson(
+          Map<String, dynamic>.from(organizerSnapshot.value as Map));
+      final updatedOrganizer = userModel.copyWith(
+        ticketsSold: (userModel.ticketsSold ?? 0) + ticketsBought,
+        totalCommission:
+            (userModel.totalCommission ?? 0.0) + (ticketPrice * ticketsBought),
+      );
+      await organizerRef.set(updatedOrganizer.toJson());
+
+      final newTicketRef = buyerTicketsRef.push();
+      final ticketId = newTicketRef.key!;
+      final ticket = TicketModel(
+        id: ticketId,
+        eventId: event.id,
+        ticketName: event.eventName,
+        location: event.location,
+        datePurchased: DateTime.now(),
+        dateOfEvent: event.date,
+        ticketType: event.eventType,
+        eventOrganizer: event.organizerId,
+        price: ticketPrice,
+        numberOfTickets: ticketsBought,
+      );
+
+      await newTicketRef.set(ticket.toJson());
+    } catch (e) {
+      rethrow;
+    }
   }
 }

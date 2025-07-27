@@ -15,28 +15,28 @@ class UserModel {
   final double? totalCommission;
 
   UserModel copyWith({
-  String? uid,
-  String? email,
-  String? name,
-  String? phoneNumber,
-  String? role,
-  String? organizationName,
-  int? totalEventsCreated,
-  double? ticketsSold,
-  double? totalCommission,
-}) {
-  return UserModel(
-    uid: uid ?? this.uid,
-    email: email ?? this.email,
-    name: name ?? this.name,
-    phoneNumber: phoneNumber ?? this.phoneNumber,
-    role: role ?? this.role,
-    organizationName: organizationName ?? this.organizationName,
-    totalEventsCreated: totalEventsCreated ?? this.totalEventsCreated,
-    ticketsSold: ticketsSold ?? this.ticketsSold,
-    totalCommission: totalCommission ?? this.totalCommission,
-  );
-}
+    String? uid,
+    String? email,
+    String? name,
+    String? phoneNumber,
+    String? role,
+    String? organizationName,
+    int? totalEventsCreated,
+    double? ticketsSold,
+    double? totalCommission,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      name: name ?? this.name,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      role: role ?? this.role,
+      organizationName: organizationName ?? this.organizationName,
+      totalEventsCreated: totalEventsCreated ?? this.totalEventsCreated,
+      ticketsSold: ticketsSold ?? this.ticketsSold,
+      totalCommission: totalCommission ?? this.totalCommission,
+    );
+  }
 
   UserModel({
     required this.uid,
@@ -44,7 +44,7 @@ class UserModel {
     required this.email,
     required this.name,
     required this.role,
-   required this.organizationName,
+    required this.organizationName,
     this.totalEventsCreated,
     this.ticketsSold,
     this.totalCommission,

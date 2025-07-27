@@ -9,13 +9,17 @@ part of 'attendee.dart';
 AttendeeModel _$AttendeeModelFromJson(Map<String, dynamic> json) =>
     AttendeeModel(
       id: json['id'] as String,
-      name: json['name'] as String,
-      isCheckedIn: json['isCheckedIn'] as bool,
+      uid: json['uid'] as String,
+      ticketsBought: (json['ticketsBought'] as num).toInt(),
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      isChecked: json['isChecked'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$AttendeeModelToJson(AttendeeModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'name': instance.name,
-      'isCheckedIn': instance.isCheckedIn,
+      'uid': instance.uid,
+      'ticketsBought': instance.ticketsBought,
+      'timestamp': instance.timestamp.toIso8601String(),
+      'isChecked': instance.isChecked,
     };
