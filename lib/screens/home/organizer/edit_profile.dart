@@ -12,9 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:project/providers/user_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  static String routeName = '/edit_profile_screen';
-
-  const EditProfileScreen({super.key});
+  final bool isOrg;
+  const EditProfileScreen({super.key, required this.isOrg});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -24,7 +23,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final DatabaseService _databaseService = DatabaseService();
 
   final TextEditingController phoneController = TextEditingController();
-  final TextEditingController organizationName = TextEditingController();
+  final TextEditingController organizationNameController =
+      TextEditingController();
   final TextEditingController nameController = TextEditingController();
 
   bool _saving = false;
@@ -37,15 +37,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     currentUser = Provider.of<UserProvider>(context, listen: false).user!;
     nameController.text = currentUser.name;
     phoneController.text = currentUser.phoneNumber;
-    organizationName.text = currentUser.organizationName ?? '';
   }
 
   Future<void> _handleSave() async {
     String name = nameController.text.trim();
     String phone = phoneController.text.trim();
-    String orgName = organizationName.text.trim();
+    String organizationName = organizationNameController.text.trim();
 
-    if (name.isEmpty || phone.isEmpty || orgName.isEmpty) {
+    if (name.isEmpty || phone.isEmpty) {
       showToast(
         'All fields are required.',
         ToastificationType.error,
@@ -60,13 +59,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await _databaseService.updateUserProfile(
         name: name,
         phone: phone,
-        organizationName: orgName,
+        organizationName: !widget.isOrg ? organizationName : null,
       );
 
       final updatedUser = currentUser.copyWith(
         name: name,
         phoneNumber: phone,
-        organizationName: orgName,
+        organizationName: !widget.isOrg ? organizationName : null,
       );
 
       if (!mounted) return;
@@ -116,11 +115,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   keyboardType: TextInputType.text,
                 ),
                 Gap(15.h),
-                FormTextField(
-                  controller: organizationName,
-                  hintText: 'Organization Name',
-                  keyboardType: TextInputType.text,
-                ),
+                widget.isOrg
+                    ? FormTextField(
+                        controller: organizationNameController,
+                        hintText: 'Organization Name',
+                        keyboardType: TextInputType.text,
+                      )
+                    : Container(),
                 Gap(15.h),
                 FormTextField(
                   controller: phoneController,

@@ -47,24 +47,33 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   Future<void> _checkEmailVerified() async {
     setState(() => isVerifying = true);
+
     final user = FirebaseAuth.instance.currentUser;
     await user?.reload();
     final refreshedUser = FirebaseAuth.instance.currentUser;
 
     if (refreshedUser != null && refreshedUser.emailVerified) {
       final userData = await DatabaseService().getUser(refreshedUser.uid);
-      final route = userData?.role == 'organizer'
-          ? Home.routeName
-          : RegularUserHome.routeName;
 
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false);
+
+      final route = userData?.role == 'organizer'
+          ? const Home()
+          : const RegularUserHome();
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => route),
+        (_) => false,
+      );
     } else {
       if (!mounted) return;
-
-      showToast('Please verify your email to continue.',
-          ToastificationType.warning, context);
+      showToast(
+        'Please verify your email to continue.',
+        ToastificationType.warning,
+        context,
+      );
     }
+
     setState(() => isVerifying = false);
   }
 
@@ -137,9 +146,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
                     if (!context.mounted) return;
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      SignInScreen.routeName,
-                      (_) => false,
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const SignInScreen()),
+                      (Route<dynamic> route) => false,
                     );
                   },
                   text: 'Back to Sign In',

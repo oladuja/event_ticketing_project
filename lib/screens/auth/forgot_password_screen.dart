@@ -9,7 +9,6 @@ import 'package:project/widgets/form_text_field.dart';
 import 'package:toastification/toastification.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  static String routeName = '/forgot_password';
 
   const ForgotPasswordScreen({super.key});
 

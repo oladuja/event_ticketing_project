@@ -15,7 +15,6 @@ import 'package:project/widgets/password_text_field.dart';
 import 'package:toastification/toastification.dart';
 
 class SignUpScreen extends StatefulWidget {
-  static String routeName = '/sign_up';
   const SignUpScreen({super.key});
 
   @override
@@ -37,8 +36,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final accountTypes = ['Individual', 'Organization'];
 
   void _signUp() async {
-    final passwordRegex = RegExp(
-        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+    final passwordRegex =
+        RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$');
     final phoneRegex = RegExp(r'^(?:\+234|0)[789][01]\d{8}$');
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
@@ -70,14 +69,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     if (!passwordRegex.hasMatch(password)) {
-      showToast('Password must be 8+ chars, with upper, lower, and a digit.',
+      showToast('Password must be 8+ chars with upper, lower, number & symbol',
           ToastificationType.error, context);
       setState(() => isVerifying = false);
       return;
     }
     if (!emailRegex.hasMatch(email)) {
-      showToast('Password must be 8+ chars, with upper, lower, and a digit.',
-          ToastificationType.error, context);
+      showToast('Email is not valid', ToastificationType.error, context);
       setState(() => isVerifying = false);
       return;
     }
@@ -207,7 +205,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   side: BorderSide(color: Colors.black, width: 2.w),
                   fillColor: WidgetStateProperty.all(Colors.black),
                   checkColor: Colors.white,
-                  onChanged: (v) => setState(() => checkboxStatus = v!),
+                  onChanged: (v) {
+                    setState(() => checkboxStatus = v!);
+                    Logger().i('Checkbox status: $checkboxStatus');
+                  },
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   title: Text(
@@ -215,19 +216,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.w600, fontSize: 14.sp)),
                 ),
-                isVerifying
+                isVerifying 
                     ? LoadingAnimationWidget.staggeredDotsWave(
                         color: Colors.black,
                         size: 30.sp,
                       )
-                    : AuthButton(onPressed: _signUp, text: 'Sign Up'),
+                    : AuthButton(onPressed: checkboxStatus?  _signUp: null, text: 'Sign Up'),
                 Gap(20.h),
                 TextButton(
                   style: ButtonStyle(
                     foregroundColor: WidgetStateProperty.all(Colors.black),
                   ),
-                  onPressed: () => Navigator.of(context)
-                      .pushReplacementNamed(SignInScreen.routeName),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => SignInScreen(),
+                    ),
+                  ),
                   child: Text(
                     'Already have an account? Sign In',
                     style: TextStyle(

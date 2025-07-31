@@ -9,8 +9,10 @@ import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:project/models/event.dart';
 import 'package:project/models/user.dart';
+import 'package:project/providers/user_provider.dart';
 import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
+import 'package:provider/provider.dart';
 
 class EventDetailScreen extends StatefulWidget {
   static String routeName = 'event_details_screen';
@@ -45,6 +47,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context, listen: false);
     final price = _getPriceForSelectedTicket();
 
     return Scaffold(
@@ -202,9 +205,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     onPressed: () async {
                       try {
                         final Customer customer = Customer(
-                          name: "Flutterwave Developer",
-                          phoneNumber: "1234566677777",
-                          email: "customer@customer.com",
+                          name: user.user!.name,
+                          phoneNumber: user.user!.phoneNumber,
+                          email: user.user!.email,
                         );
 
                         final Flutterwave flutterwave = Flutterwave(
@@ -228,9 +231,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         if (response.status == 'successful') {
                           await DatabaseService().handleSuccessfulPurchase(
                             event: widget.event,
-                            ticketsBought: 2,
-                            ticketPrice: 5000.0,
+                            ticketsBought: quantity,
+                            ticketPrice: price,
                             buyerId: AuthService().currentUser!.uid,
+                            ticketType: selectedTicket,
+                            organizerName: user.user!.name,
                           );
                         }
                       } catch (e) {

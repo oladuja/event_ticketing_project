@@ -17,8 +17,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:toastification/toastification.dart';
 
 class ProfileScreen extends StatefulWidget {
-  static String routeName = '/profile_screen';
-
   const ProfileScreen({super.key});
 
   @override
@@ -26,7 +24,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // final DatabaseService _databaseService = DatabaseService();
   final RefreshController _refreshController = RefreshController();
 
   @override
@@ -34,26 +31,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
   }
 
-  // Future<void> fetchUserData() async {
-  //   final userData = await _databaseService.getCurrentUserProfile();
-  //   if (userData != null) {
-  //     final user = UserModel.fromJson(userData);
-  //     setState(() {
-  //       name = user.name;
-  //       email = user.email;
-  //       isLoading = false;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       name = '';
-  //       email = '';
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
-
   void _onRefresh() {
-    // fetchUserData();
+    setState(() {});
     _refreshController.refreshCompleted();
   }
 
@@ -126,8 +105,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           trailing: GestureDetector(
                             onTap: () async {
-                              final shouldRefresh = await Navigator.of(context)
-                                  .pushNamed(EditProfileScreen.routeName);
+                              final shouldRefresh =
+                                  await Navigator.of(context).push<bool>(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const EditProfileScreen(isOrg: true),
+                                ),
+                              );
+
                               if (shouldRefresh == true) {}
                             },
                             child: Container(

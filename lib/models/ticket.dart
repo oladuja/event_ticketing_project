@@ -5,8 +5,10 @@ part 'ticket.g.dart';
 @JsonSerializable()
 class TicketModel {
   final String id;
-  final String eventId;
-  final String ticketName;
+  final String imageUrl;
+  final String eventName;
+    final String eventId;
+  final String attendeeId;
   final String location;
   @JsonKey(fromJson: _fromJson, toJson: _toJson)
   final DateTime datePurchased;
@@ -20,8 +22,8 @@ class TicketModel {
 
   TicketModel({
     required this.id,
-    required this.eventId,
-    required this.ticketName,
+    required this.imageUrl,
+    required this.eventName,
     required this.location,
     required this.datePurchased,
     required this.dateOfEvent,
@@ -29,6 +31,8 @@ class TicketModel {
     required this.eventOrganizer,
     required this.price,
     required this.numberOfTickets,
+    required this.eventId,
+    required this.attendeeId,
   });
 
   static DateTime _fromJson(int milliseconds) =>

@@ -9,7 +9,6 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ListOfEventScreeen extends StatefulWidget {
-  static String routeName = '/list_of_event_screen';
   const ListOfEventScreeen({super.key});
 
   @override

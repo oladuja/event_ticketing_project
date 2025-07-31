@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:project/utils/show_toast.dart';
+import 'package:toastification/toastification.dart';
 
 class ContactUsScreen extends StatefulWidget {
   const ContactUsScreen({super.key});
@@ -25,8 +27,10 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Message sent successfully')),
+      showToast(
+        'Message sent successfully',
+        ToastificationType.success,
+        context,
       );
       _formKey.currentState!.reset();
     }
@@ -36,7 +40,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+        backgroundColor: const Color.fromARGB(255, 245, 245, 245),
         title: const Text(
           'Contact Us',
           style: TextStyle(

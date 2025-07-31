@@ -8,9 +8,11 @@ part of 'ticket.dart';
 
 TicketModel _$TicketModelFromJson(Map<String, dynamic> json) => TicketModel(
       id: json['id'] as String,
-      eventId: json['eventId'] as String,
-      ticketName: json['ticketName'] as String,
+      imageUrl: json['imageUrl'] as String,
+      eventName: json['eventName'] as String,
       location: json['location'] as String,
+      eventId: json['eventId'] as String,
+      attendeeId: json['attendeeId'] as String,
       datePurchased:
           TicketModel._fromJson((json['datePurchased'] as num).toInt()),
       dateOfEvent: TicketModel._fromJson((json['dateOfEvent'] as num).toInt()),
@@ -23,9 +25,11 @@ TicketModel _$TicketModelFromJson(Map<String, dynamic> json) => TicketModel(
 Map<String, dynamic> _$TicketModelToJson(TicketModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'eventId': instance.eventId,
-      'ticketName': instance.ticketName,
+      'imageUrl': instance.imageUrl,
+      'eventName': instance.eventName,
       'location': instance.location,
+      'eventId': instance.eventId,
+      'attendeeId': instance.attendeeId,
       'datePurchased': TicketModel._toJson(instance.datePurchased),
       'dateOfEvent': TicketModel._toJson(instance.dateOfEvent),
       'ticketType': instance.ticketType,

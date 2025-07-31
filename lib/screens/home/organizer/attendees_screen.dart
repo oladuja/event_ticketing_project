@@ -1,45 +1,87 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:project/models/attendee.dart';
+import 'package:project/models/user.dart';
+import 'package:project/services/database_service.dart';
 
 class AttendeesScreen extends StatelessWidget {
-  const AttendeesScreen({super.key});
+  final List<AttendeeModel> attendees;
+
+  const AttendeesScreen({super.key, required this.attendees});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Attendees',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+      appBar: AppBar(
+        title: Text(
+          'Attendees',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color.fromARGB(255, 245, 245, 245),
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.w),
-          child: ListView.builder(
-            itemCount: 100,
-            padding: EdgeInsets.zero,
-            itemBuilder: (BuildContext context, int index) => ListTile(
-              title: Text(
-                'Danny Willson',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
+      ),
+      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+      body: attendees.isEmpty
+          ? Center(
+              child: Padding(
+                padding: EdgeInsets.all(20.h),
+                child: Text(
+                  "No attendees yet.",
+                  style: TextStyle(fontSize: 16.sp),
                 ),
               ),
-              subtitle: Text(
-                '#NSDFI23NINSDKNSDNFI33',
-                style: TextStyle(
-                  fontSize: 12.sp,
-                ),
-              ),
-              trailing: Checkbox(
-                value: true,
-                fillColor: WidgetStateColor.resolveWith((_) => Colors.black),
-                onChanged: (_) {},
-              ),
+            )
+          : ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 15.w),
+              itemCount: attendees.length,
+              itemBuilder: (BuildContext context, int index) {
+                final attendee = attendees[index];
+                return FutureBuilder<UserModel?>(
+                  future: DatabaseService().getUser(attendee.uid),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: LoadingAnimationWidget.staggeredDotsWave(
+                          color: Colors.black,
+                          size: 30.sp,
+                        ),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text(
+                        'An error occurred',
+                        style: TextStyle(color: Colors.red),
+                      );
+                    } else if (!snapshot.hasData || snapshot.data == null) {
+                      return Text(
+                        'An error occurred',
+                        style: TextStyle(color: Colors.red),
+                      );
+                    }
+
+                    final user = snapshot.data!;
+                    return ListTile(
+                      title: Text(
+                        'Name: ${user.email}\nEmail: ${user.name}',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'TIcket ID: ${attendee.id}',
+                        style: TextStyle(fontSize: 12.sp),
+                      ),
+                      trailing: Checkbox(
+                        value: attendee.isChecked,
+                        fillColor:
+                            WidgetStateColor.resolveWith((_) => Colors.black),
+                        onChanged: null,
+                      ),
+                    );
+                  },
+                );
+              },
             ),
-          ),
-        ));
+    );
   }
 }

@@ -1,17 +1,40 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
+import 'package:project/models/ticket.dart';
+import 'package:project/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class TicketDetailsScreen extends StatelessWidget {
-  final String data = "Hello, this is QR data!";
+  final TicketModel ticket;
+  const TicketDetailsScreen({super.key, required this.ticket});
 
-  final dynamic tag;
-  const TicketDetailsScreen({super.key, required this.tag});
+  String formatDate(DateTime date) {
+    return DateFormat.yMMMMEEEEd().add_jm().format(date);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context, listen: false);
+    final formattedDate = formatDate(ticket.dateOfEvent);
+
+    final qrData = {
+      'eventId': ticket.eventId,
+      'attendeeId': ticket.attendeeId,
+      'userId': user.user!.uid,
+      'ticketId': ticket.id,
+      'ticketType': ticket.ticketType,
+      'eventName': ticket.eventName,
+      'eventOrganizer': ticket.eventOrganizer,
+      'location': ticket.location,
+      'price': ticket.price,
+      'numberOfTickets': ticket.numberOfTickets,
+      'dateOfEvent': formattedDate,
+    };
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -29,33 +52,36 @@ class TicketDetailsScreen extends StatelessWidget {
             children: [
               Center(
                 child: QrImageView(
-                  data: data,
+                  data: jsonEncode(qrData),
                   version: QrVersions.auto,
                   size: 250.h,
                 ),
               ),
               Text(
-                'Ife & Temi Live Concert',
+                ticket.eventName,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.sp,
                 ),
               ),
               Gap(10.h),
-              ticketInformation('TICKET ID', '213213NK1N2L32L13'),
+              ticketInformation('TICKET ID', ticket.id),
               Gap(5.h),
-              ticketInformation('EVENT ORGANIZER', 'Taiwo Ifeoluwa'),
+              ticketInformation('EVENT ORGANIZER', ticket.eventOrganizer),
               Gap(5.h),
-              ticketInformation('EVENT LOCATION', 'LAGOS'),
+              ticketInformation('EVENT LOCATION', ticket.location),
               Gap(5.h),
-              ticketInformation('PRICE', '₦5,000.00'),
+              ticketInformation('PRICE', '₦${ticket.price.toStringAsFixed(2)}'),
               Gap(5.h),
-              ticketInformation('TICKET TYPE', 'Regular'),
+              ticketInformation('TICKET TYPE', ticket.ticketType),
               Gap(5.h),
-              ticketInformation('NO. OF TICKETS', '2'),
+              ticketInformation(
+                  'NO. OF TICKETS', ticket.numberOfTickets.toString()),
               Gap(5.h),
-              ticketInformation('DATE & TIME',
-                  DateFormat.yMEd().add_jms().format(DateTime.now())),
+              ticketInformation(
+                'DATE & TIME ',
+                formatDate(ticket.dateOfEvent),
+              ),
               Gap(20.h),
             ],
           ),

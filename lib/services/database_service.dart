@@ -39,9 +39,10 @@ class DatabaseService {
         final data = Map<String, dynamic>.from(snapshot.value as Map);
 
         final user = UserModel.fromJson(Map<String, dynamic>.from(data));
+
         return {
-          'totalCommission': user.totalCommission?? 0,
-          'totalEventsCreated':user.totalEventsCreated ?? 0,
+          'totalCommission': user.totalCommission ?? 0,
+          'totalEventsCreated': user.totalEventsCreated ?? 0,
           'ticketsSold': user.ticketsSold ?? 0,
         };
       } else {
@@ -165,27 +166,10 @@ class DatabaseService {
     }
   }
 
-  // Future<Map<String, dynamic>?> getCurrentUserProfile() async {
-  //   try {
-  //     final uid = _auth.currentUser?.uid;
-  //     if (uid == null) return null;
-
-  //     final snapshot = await _db.child('users/$uid').get();
-
-  //     if (snapshot.exists) {
-  //       return Map<String, dynamic>.from(snapshot.value as Map);
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
-
   Future<void> updateUserProfile({
     required String name,
     required String phone,
-    required String organizationName,
+    String? organizationName,
   }) async {
     try {
       final uid = _auth.currentUser?.uid;
@@ -222,14 +206,14 @@ class DatabaseService {
     required int ticketsBought,
     required double ticketPrice,
     required String buyerId,
+    required String ticketType,
+    required String organizerName,
   }) async {
     try {
       final eventRef = _db.child('events/${event.id}');
       final attendeesRef = eventRef.child('attendees');
       final organizerRef = _db.child('users/${event.organizerId}');
       final buyerTicketsRef = _db.child('tickets/$buyerId');
-
-
 
       if (event.availableTickets < ticketsBought) {
         throw Exception('Not enough tickets available');
@@ -268,18 +252,56 @@ class DatabaseService {
       final ticketId = newTicketRef.key!;
       final ticket = TicketModel(
         id: ticketId,
-        eventId: event.id,
-        ticketName: event.eventName,
+        imageUrl: event.imageUrl,
+        eventName: event.eventName,
         location: event.location,
+        eventId: event.id,
+        attendeeId: attendeeId,
         datePurchased: DateTime.now(),
         dateOfEvent: event.date,
-        ticketType: event.eventType,
-        eventOrganizer: event.organizerId,
+        ticketType: ticketType,
+        eventOrganizer: organizerName,
         price: ticketPrice,
         numberOfTickets: ticketsBought,
       );
 
       await newTicketRef.set(ticket.toJson());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<TicketModel>> fetchUserTickets(String uid) async {
+    try {
+      final ref = _db.child('tickets/$uid');
+      final snapshot = await ref.get();
+
+      if (!snapshot.exists) return [];
+
+      final map = Map<String, dynamic>.from(snapshot.value as Map);
+      return map.entries.map((e) {
+        final ticketJson = Map<String, dynamic>.from(e.value);
+        return TicketModel.fromJson(ticketJson);
+      }).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<AttendeeModel>> fetchEventAttendees(String eventId) async {
+    try {
+      final snapshot = await _db.child('events/$eventId/attendees').get();
+
+      if (!snapshot.exists) return [];
+
+      final data = Map<String, dynamic>.from(snapshot.value as Map);
+
+      final attendees = data.entries.map((e) {
+        final attendeeData = Map<String, dynamic>.from(e.value);
+        return AttendeeModel.fromJson(attendeeData);
+      }).toList();
+
+      return attendees;
     } catch (e) {
       rethrow;
     }

@@ -14,7 +14,6 @@ import 'package:toastification/toastification.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CreateEvent extends StatefulWidget {
-  static String routeName = '/create_event';
 
   const CreateEvent({super.key});
 

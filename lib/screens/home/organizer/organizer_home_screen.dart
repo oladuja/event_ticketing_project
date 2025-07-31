@@ -7,6 +7,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/event.dart';
 import 'package:project/screens/home/organizer/attendees_screen.dart';
 import 'package:project/screens/home/organizer/create_event.dart';
+import 'package:project/screens/home/organizer/scan_qr_code.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/amount_text.dart';
 import 'package:project/widgets/details_text.dart';
@@ -18,8 +19,6 @@ import 'package:toastification/toastification.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class OrganizerHomeScreen extends StatefulWidget {
-  static String routeName = '/organizer_home_screen';
-
   const OrganizerHomeScreen({super.key});
 
   @override
@@ -60,7 +59,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
       setState(() {
         totalCommission = (stats['totalCommission'] as num).toDouble();
         eventsCreated = stats['totalEventsCreated'];
-        ticketsSold = stats['ticketsSold'];
+        ticketsSold = (stats['ticketsSold'] as num).toInt();
         liveEvents = todayEvents;
 
         isLoading = false;
@@ -183,7 +182,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                               return GestureDetector(
                                 onTap: () => Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) => AttendeesScreen(),
+                                    builder: (_) => AttendeesScreen(attendees: event.attendees),
                                   ),
                                 ),
                                 child: Container(
@@ -239,7 +238,9 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
             shape: CircleBorder(),
             child: FaIcon(FontAwesomeIcons.qrcode, color: Colors.white),
             backgroundColor: Colors.black,
-            onTap: () {},
+            onTap: ()=> Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const QRScannerScreen()),
+            ),
             label: 'Scan QR Code',
             labelStyle: TextStyle(
               fontWeight: FontWeight.w500,
@@ -253,7 +254,9 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
             shape: CircleBorder(),
             child: FaIcon(FontAwesomeIcons.plus, color: Colors.white),
             backgroundColor: Colors.black,
-            onTap: () => Navigator.of(context).pushNamed(CreateEvent.routeName),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CreateEvent()),
+            ),
             label: 'Create Event',
             labelShadow: [BoxShadow(color: Colors.transparent)],
             labelStyle: TextStyle(

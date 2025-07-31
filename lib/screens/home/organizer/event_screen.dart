@@ -12,7 +12,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:toastification/toastification.dart';
 
 class EventScreen extends StatefulWidget {
-  static String routeName = '/event_screen';
   const EventScreen({super.key});
 
   @override
@@ -105,9 +104,15 @@ class _EventScreenState extends State<EventScreen>
 
   Widget _buildEventTile(EventModel event) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const AttendeesScreen()),
-      ),
+      onTap: () async {
+        final attendees = await _databaseService.fetchEventAttendees(event.id);
+        if (!mounted) return;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => AttendeesScreen(attendees: attendees),
+          ),
+          );
+      },
       child: Container(
         margin: EdgeInsets.all(8.w),
         decoration: BoxDecoration(

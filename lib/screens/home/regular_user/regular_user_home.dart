@@ -6,7 +6,6 @@ import 'package:project/screens/home/regular_user/regular_user_home_screen.dart'
 import 'package:project/screens/home/regular_user/user_profile_screen.dart';
 
 class RegularUserHome extends StatefulWidget {
-  static String routeName = '/regular_user_home';
   const RegularUserHome({super.key});
 
   @override

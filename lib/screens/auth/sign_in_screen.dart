@@ -16,7 +16,6 @@ import 'package:project/widgets/password_text_field.dart';
 import 'package:toastification/toastification.dart';
 
 class SignInScreen extends StatefulWidget {
-  static String routeName = '/sign_in';
   const SignInScreen({super.key});
 
   @override
@@ -48,9 +47,10 @@ class _SignInScreenState extends State<SignInScreen> {
         await user.sendEmailVerification();
         if (!mounted) return;
         showToast(
-            'Please verify your email. A new verification link has been sent.',
-            ToastificationType.warning,
-            context);
+          'Please verify your email. A new verification link has been sent.',
+          ToastificationType.warning,
+          context,
+        );
         if (!mounted) return;
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const VerifyEmailScreen()),
@@ -60,12 +60,19 @@ class _SignInScreenState extends State<SignInScreen> {
       }
 
       final userData = await DatabaseService().getUser(user!.uid);
-      final route = userData?.role == 'organizer'
-          ? Home.routeName
-          : RegularUserHome.routeName;
-
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false);
+
+      if (userData?.role == 'organizer') {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const Home()),
+          (_) => false,
+        );
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const RegularUserHome()),
+          (_) => false,
+        );
+      }
     } on AuthException catch (e) {
       showToast(e.message, ToastificationType.error, context);
     } catch (e) {
@@ -90,11 +97,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   style:
                       TextStyle(fontWeight: FontWeight.bold, fontSize: 24.sp),
                 ),
-                Text('Welcome back',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.sp,
-                    )),
+                Text(
+                  'Welcome back',
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                ),
                 Gap(30.h),
                 FormTextField(
                   controller: emailController,
@@ -103,27 +110,37 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 Gap(15.h),
                 PasswordTextField(
-                    controller: passwordController, hintText: 'Password'),
+                  controller: passwordController,
+                  hintText: 'Password',
+                ),
                 Gap(10.h),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () => Navigator.of(context)
-                        .pushNamed(ForgotPasswordScreen.routeName),
-                    child: Text('Forgot Password?',
-                        style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const ForgotPasswordScreen()),
+                    ),
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                    ),
                   ),
                 ),
                 Gap(30.h),
                 TextButton(
-                  onPressed: () => Navigator.of(context)
-                      .pushNamedAndRemoveUntil(
-                          SignUpScreen.routeName, (_) => false),
-                  child: Text('Don\'t have an account? Sign Up',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15.sp)),
+                  onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                    (_) => false,
+                  ),
+                  child: Text(
+                    'Don\'t have an account? Sign Up',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15.sp,
+                    ),
+                  ),
                 ),
                 Gap(20.h),
                 isVerifying

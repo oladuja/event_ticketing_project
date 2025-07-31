@@ -6,7 +6,6 @@ import 'package:project/screens/home/organizer/organizer_home_screen.dart';
 import 'package:project/screens/home/organizer/profile_screen.dart';
 
 class Home extends StatefulWidget {
-  static String routeName = '/home';
   const Home({super.key});
 
   @override
