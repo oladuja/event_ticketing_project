@@ -6,14 +6,16 @@ import 'package:flutterwave_standard/models/requests/customizations.dart';
 import 'package:flutterwave_standard/models/responses/charge_response.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
 import 'package:project/models/event.dart';
 import 'package:project/models/user.dart';
-import 'package:project/providers/ticket_notifier.dart';
+import 'package:project/providers/state_notifier.dart';
 import 'package:project/providers/user_provider.dart';
 import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
+import 'package:project/utils/format_date.dart';
+import 'package:project/utils/show_toast.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 
 class EventDetailScreen extends StatefulWidget {
   const EventDetailScreen({super.key, required this.tag, required this.event});
@@ -97,7 +99,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   FaIcon(FontAwesomeIcons.calendar, size: 16.sp),
                   Gap(8.w),
                   Text(
-                    DateFormat.yMEd().add_jms().format(widget.event.date),
+                    formatDate(widget.event.date),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -239,10 +241,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           );
                         }
                         if (context.mounted) {
-                          Provider.of<TicketNotifier>(context, listen: false)
+                          Provider.of<StateNotifier>(context, listen: false)
                               .triggerRefresh();
                         }
-                      } catch (e) {}
+                      } catch (e) {
+                           if (!context.mounted) return;
+                            showToast('An error occurred while processing payment',
+                                ToastificationType.error, context);
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,

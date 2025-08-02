@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/user.dart';
-import 'package:project/providers/ticket_notifier.dart';
+import 'package:project/providers/state_notifier.dart';
 import 'package:project/providers/user_provider.dart';
 import 'package:project/screens/auth/sign_in_screen.dart';
 import 'package:project/screens/home/organizer/home.dart';
@@ -22,7 +22,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => TicketNotifier()),
+        ChangeNotifierProvider(create: (_) => StateNotifier()),
       ],
       child: const MyApp(),
     ),

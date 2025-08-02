@@ -5,10 +5,12 @@ import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/event.dart';
+import 'package:project/providers/state_notifier.dart';
 import 'package:project/screens/home/organizer/attendees_screen.dart';
 import 'package:project/screens/home/organizer/create_event.dart';
 import 'package:project/screens/home/organizer/scan_qr_code.dart';
 import 'package:project/services/auth_service.dart';
+import 'package:project/utils/format_date.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/amount_text.dart';
 import 'package:project/widgets/details_text.dart';
@@ -45,6 +47,25 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
   void initState() {
     super.initState();
     _loadOrganizerData();
+  }
+
+  void refreshEvents() async {
+    final events = await _databaseService
+        .fetchTodayEventsByOrganizer(AuthService().currentUser!.uid);
+    setState(() {
+      liveEvents = events;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final stateNotifier = Provider.of<StateNotifier>(context);
+    if (stateNotifier.shouldRefresh) {
+      refreshEvents();
+
+      stateNotifier.resetRefreshFlag();
+    }
   }
 
   Future<void> _loadOrganizerData() async {
@@ -215,7 +236,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                                       ),
                                     ),
                                     subtitle: Text(
-                                      '${DateFormat.yMEd().add_jms().format(event.date)}'
+                                      '${formatDate(event.date)}'
                                       '\nNumber of Tickets: ${event.totalTickets}'
                                       '\nAvailable Tickets: ${event.availableTickets}',
                                       style: TextStyle(fontSize: 12.sp),

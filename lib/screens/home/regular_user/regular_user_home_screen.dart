@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/ticket.dart';
-import 'package:project/providers/ticket_notifier.dart';
+import 'package:project/providers/state_notifier.dart';
 import 'package:project/screens/home/regular_user/ticket_details_screen.dart';
+import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
+import 'package:project/utils/format_date.dart';
+import 'package:project/utils/show_toast.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:toastification/toastification.dart';
 
 class RegularHomeScreen extends StatefulWidget {
-
   const RegularHomeScreen({super.key});
 
   @override
@@ -38,13 +39,15 @@ class _RegularHomeScreenState extends State<RegularHomeScreen>
   Future<void> _fetchTickets() async {
     setState(() => _loading = true);
     try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
+      final uid = AuthService().currentUser?.uid;
       if (uid == null) throw Exception('User not logged in');
 
       final tickets = await _databaseService.fetchUserTickets(uid);
       setState(() => _tickets = tickets);
     } catch (e) {
-      
+      if (!mounted) return;
+      showToast('An error occurred while fetching tickets',
+          ToastificationType.error, context);
     } finally {
       setState(() => _loading = false);
     }
@@ -56,14 +59,14 @@ class _RegularHomeScreenState extends State<RegularHomeScreen>
   }
 
   @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  final ticketNotifier = Provider.of<TicketNotifier>(context);
-  if (ticketNotifier.shouldRefresh) {
-    _fetchTickets();
-    ticketNotifier.resetRefreshFlag(); 
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final stateNotifier = Provider.of<StateNotifier>(context);
+    if (stateNotifier.shouldRefresh) {
+      _fetchTickets();
+      stateNotifier.resetRefreshFlag();
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +117,8 @@ void didChangeDependencies() {
                         return GestureDetector(
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => TicketDetailsScreen(ticket: ticket),
+                              builder: (_) =>
+                                  TicketDetailsScreen(ticket: ticket),
                             ),
                           ),
                           child: Container(
@@ -128,7 +132,7 @@ void didChangeDependencies() {
                                 width: 50.h,
                                 height: 50.h,
                                 decoration: BoxDecoration(
-                                 image: DecorationImage(
+                                  image: DecorationImage(
                                     image: NetworkImage(ticket.imageUrl),
                                     fit: BoxFit.cover,
                                   ),
@@ -142,9 +146,10 @@ void didChangeDependencies() {
                                   fontSize: 16.sp,
                                 ),
                               ),
-                              trailing: Text('Ticket Type: \n${ticket.ticketType}'),
+                              trailing:
+                                  Text('Ticket Type: \n${ticket.ticketType}'),
                               subtitle: Text(
-                                'Date Purchased: ${DateFormat.yMEd().add_jms().format(ticket.datePurchased)}',
+                                'Date Purchased: ${formatDate(ticket.datePurchased)}',
                                 style: TextStyle(fontSize: 12.sp),
                               ),
                             ),

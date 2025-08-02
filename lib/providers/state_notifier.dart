@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TicketNotifier extends ChangeNotifier {
+class StateNotifier extends ChangeNotifier {
   bool _shouldRefresh = false;
 
   bool get shouldRefresh => _shouldRefresh;

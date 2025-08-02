@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/event.dart';
 import 'package:project/screens/home/organizer/attendees_screen.dart';
 import 'package:project/screens/home/organizer/edit_event_screen.dart';
+import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
+import 'package:project/utils/format_date.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:toastification/toastification.dart';
@@ -40,11 +41,17 @@ class _EventScreenState extends State<EventScreen>
   Future<void> _loadEvents() async {
     setState(() => _loading = true);
     try {
-      final events = await _databaseService.fetchEvents();
+      final events = await _databaseService
+          .fetchOrganizerEventsByID(AuthService().currentUser!.uid);
       setState(() {
         _events = events;
       });
-    } finally {
+    } 
+    catch (e) {
+      if (!mounted) return;
+      showToast('Failed to load events.', ToastificationType.error, context);
+    }
+    finally {
       setState(() => _loading = false);
       _refreshController.refreshCompleted();
     }
@@ -136,11 +143,7 @@ class _EventScreenState extends State<EventScreen>
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
           ),
           subtitle: Text(
-            '${DateFormat.yMEd().add_jms().format(
-                  DateTime.parse(
-                    event.date.toIso8601String(),
-                  ),
-                )}\nNumber of Tickets: ${event.totalTickets}\nAvailable Tickets: ${event.availableTickets}',
+            '${formatDate(event.date)}\nNumber of Tickets: ${event.totalTickets}\nAvailable Tickets: ${event.availableTickets}',
             style: TextStyle(fontSize: 12.sp),
           ),
           trailing: PopupMenuButton<String>(

@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:intl/intl.dart';
 import 'package:project/models/attendee.dart';
+import 'package:project/utils/format_date.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:toastification/toastification.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
@@ -19,9 +19,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   QRViewController? controller;
   bool scanned = false;
 
-   String formatDate(DateTime date) {
-    return DateFormat.yMMMMEEEEd().add_jm().format(date);
-  }
+
 
 
   @override

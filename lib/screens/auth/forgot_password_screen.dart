@@ -9,7 +9,6 @@ import 'package:project/widgets/form_text_field.dart';
 import 'package:toastification/toastification.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-
   const ForgotPasswordScreen({super.key});
 
   @override
@@ -100,7 +99,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 context);
                           } catch (e) {
                             if (!mounted) return;
-                            showToast('Reset Password failed: $e',
+                            showToast('Reset Password failed.',
                                 ToastificationType.error, context);
                           }
                           setState(() => isVerifying = false);

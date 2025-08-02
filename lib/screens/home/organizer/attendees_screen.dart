@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/attendee.dart';
 import 'package:project/models/user.dart';
 import 'package:project/services/database_service.dart';
@@ -40,12 +39,7 @@ class AttendeesScreen extends StatelessWidget {
                   future: DatabaseService().getUser(attendee.uid),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: LoadingAnimationWidget.staggeredDotsWave(
-                          color: Colors.black,
-                          size: 30.sp,
-                        ),
-                      );
+                      return Container();
                     } else if (snapshot.hasError) {
                       return Text(
                         'An error occurred',
@@ -61,7 +55,7 @@ class AttendeesScreen extends StatelessWidget {
                     final user = snapshot.data!;
                     return ListTile(
                       title: Text(
-                        'Name: ${user.email}\nEmail: ${user.name}',
+                        'Email: ${user.email}\nName: ${user.name}',
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,

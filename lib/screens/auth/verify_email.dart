@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:logger/web.dart';
 import 'package:project/screens/auth/sign_in_screen.dart';
 import 'package:project/screens/home/organizer/home.dart';
 import 'package:project/screens/home/regular_user/regular_user_home.dart';
+import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/auth_button.dart';
@@ -48,27 +48,36 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   Future<void> _checkEmailVerified() async {
     setState(() => isVerifying = true);
 
-    final user = FirebaseAuth.instance.currentUser;
-    await user?.reload();
-    final refreshedUser = FirebaseAuth.instance.currentUser;
+    try {
+      final user = AuthService().currentUser;
+      await user?.reload();
+      final refreshedUser = AuthService().currentUser;
 
-    if (refreshedUser != null && refreshedUser.emailVerified) {
-      final userData = await DatabaseService().getUser(refreshedUser.uid);
+      if (refreshedUser != null && refreshedUser.emailVerified) {
+        final userData = await DatabaseService().getUser(refreshedUser.uid);
 
-      if (!mounted) return;
+        if (!mounted) return;
 
-      final route = userData?.role == 'organizer'
-          ? const Home()
-          : const RegularUserHome();
+        final route = userData?.role == 'organizer'
+            ? const Home()
+            : const RegularUserHome();
 
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => route),
-        (_) => false,
-      );
-    } else {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => route),
+          (_) => false,
+        );
+      } else {
+        if (!mounted) return;
+        showToast(
+          'Please verify your email to continue.',
+          ToastificationType.warning,
+          context,
+        );
+      }
+    } catch (e) {
       if (!mounted) return;
       showToast(
-        'Please verify your email to continue.',
+        'An error occurred while verifying your email',
         ToastificationType.warning,
         context,
       );
@@ -78,14 +87,17 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   }
 
   Future<void> _resendEmail() async {
-    final user = FirebaseAuth.instance.currentUser;
-    Logger().i(user);
-    await user?.sendEmailVerification();
-    if (!mounted) return;
+    try {
+      final user = AuthService().currentUser;
+      await user?.sendEmailVerification();
+      if (!mounted) return;
 
-    showToast('Verification email resent. Please check your inbox.',
-        ToastificationType.success, context);
-    _startCooldown();
+      showToast('Verification email resent. Please check your inbox.',
+          ToastificationType.success, context);
+      _startCooldown();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
@@ -144,12 +156,20 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 Gap(20.h),
                 AuthButton(
                   onPressed: () async {
-                    await FirebaseAuth.instance.signOut();
-                    if (!context.mounted) return;
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const SignInScreen()),
-                      (Route<dynamic> route) => false,
-                    );
+                    try {
+                      await FirebaseAuth.instance.signOut();
+                      if (!context.mounted) return;
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const SignInScreen()),
+                        (Route<dynamic> route) => false,
+                      );
+                    } catch (e) {
+                      showToast(
+                        'An error occurred.',
+                        ToastificationType.error,
+                        context,
+                      );
+                    }
                   },
                   text: 'Back to Sign In',
                 ),

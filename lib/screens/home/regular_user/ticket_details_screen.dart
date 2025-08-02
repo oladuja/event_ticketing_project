@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
 import 'package:project/models/ticket.dart';
 import 'package:project/providers/user_provider.dart';
+import 'package:project/utils/format_date.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -12,9 +12,7 @@ class TicketDetailsScreen extends StatelessWidget {
   final TicketModel ticket;
   const TicketDetailsScreen({super.key, required this.ticket});
 
-  String formatDate(DateTime date) {
-    return DateFormat.yMMMMEEEEd().add_jm().format(date);
-  }
+ 
 
   @override
   Widget build(BuildContext context) {

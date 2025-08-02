@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
 import 'package:project/models/event.dart';
 import 'package:project/screens/home/regular_user/event_detail_screen.dart';
 import 'package:project/services/database_service.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:project/utils/format_date.dart';
+import 'package:project/utils/show_toast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:toastification/toastification.dart';
 
 class ListOfEventScreeen extends StatefulWidget {
   const ListOfEventScreeen({super.key});
@@ -36,12 +37,17 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
     setState(() => _loading = true);
     try {
       final events = await _databaseService.fetchEvents();
-      events.sort((a, b) => a.date.compareTo(b.date));
       setState(() => _events = events);
     } catch (e) {
-      Logger().e('Error fetching events: $e');
+      if (!mounted) return;
+     showToast(
+        'Failed to load events.',
+        ToastificationType.error,
+        context,
+      );
     } finally {
       setState(() => _loading = false);
+      _refreshController.refreshCompleted();
     }
   }
 
@@ -140,7 +146,7 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
                                 ),
                               ),
                               subtitle: Text(
-                                '${DateFormat.yMEd().add_jms().format(event.date)}\n'
+                                '${formatDate(event.date)}\n'
                                 'Price: ₦${event.ticketsType.isNotEmpty ? event.ticketsType.first["price"] : "N/A"}\n'
                                 '${event.availableTickets} Ticket(s) Left',
                                 style: TextStyle(fontSize: 12.sp),

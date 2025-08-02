@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:project/models/event.dart';
+import 'package:project/providers/state_notifier.dart';
 import 'package:project/services/database_service.dart';
+import 'package:project/utils/format_date.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/event_details_textfield.dart';
+import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 class EditEvent extends StatefulWidget {
@@ -138,9 +141,7 @@ class _EditEventState extends State<EditEvent> {
                         Gap(10.w),
                         Text(
                           _selectedDateTime != null
-                              ? '${_selectedDateTime!.toLocal()}'
-                                  .split('.')
-                                  .first
+                              ? formatDate(_selectedDateTime!)
                               : 'Select date & time',
                           style: TextStyle(
                             color: _selectedDateTime != null
@@ -208,6 +209,10 @@ class _EditEventState extends State<EditEvent> {
                     try {
                       await DatabaseService()
                           .updateEventInDatabase(updatedEvent);
+                      if (context.mounted) {
+                        Provider.of<StateNotifier>(context, listen: false)
+                            .triggerRefresh();
+                      }
                       if (context.mounted) {
                         Navigator.of(context).pop(true);
                         showToast(
