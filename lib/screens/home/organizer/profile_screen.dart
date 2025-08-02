@@ -113,7 +113,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               );
 
-                              if (shouldRefresh == true) {}
+                              if (shouldRefresh == true) {
+                                setState(() {});
+                              }
                             },
                             child: Container(
                               padding: EdgeInsets.all(8.0.w),

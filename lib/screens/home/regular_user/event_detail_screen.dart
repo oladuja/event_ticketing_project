@@ -9,13 +9,13 @@ import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:project/models/event.dart';
 import 'package:project/models/user.dart';
+import 'package:project/providers/ticket_notifier.dart';
 import 'package:project/providers/user_provider.dart';
 import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
 import 'package:provider/provider.dart';
 
 class EventDetailScreen extends StatefulWidget {
-  static String routeName = 'event_details_screen';
   const EventDetailScreen({super.key, required this.tag, required this.event});
 
   final dynamic tag;
@@ -238,9 +238,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             organizerName: user.user!.name,
                           );
                         }
-                      } catch (e) {
-                        debugPrint('Payment error: $e');
-                      }
+                        if (context.mounted) {
+                          Provider.of<TicketNotifier>(context, listen: false)
+                              .triggerRefresh();
+                        }
+                      } catch (e) {}
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,

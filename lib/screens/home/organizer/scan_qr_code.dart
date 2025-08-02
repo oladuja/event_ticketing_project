@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
 import 'package:project/models/attendee.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:toastification/toastification.dart';
@@ -17,6 +18,11 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
   bool scanned = false;
+
+   String formatDate(DateTime date) {
+    return DateFormat.yMMMMEEEEd().add_jm().format(date);
+  }
+
 
   @override
   void dispose() {
@@ -53,7 +59,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         final attendeeData = Map<String, dynamic>.from(snapshot.value as Map);
         final attendee = AttendeeModel.fromJson(attendeeData);
 
-        // Update isChecked to true
         await attendeeRef.update({'isChecked': true});
 
         if (!mounted) return;
@@ -71,7 +76,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                 Text("User ID: ${attendee.uid}"),
                 Text("Tickets Bought: ${attendee.ticketsBought}"),
                 Text("Checked In: true"),
-                Text("Timestamp: ${attendee.timestamp}"),
+                Text("Timestamp: ${formatDate(attendee.timestamp)}"),
               ],
             ),
             actions: [

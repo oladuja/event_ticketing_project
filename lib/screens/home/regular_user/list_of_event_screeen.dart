@@ -100,12 +100,14 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
                       itemBuilder: (context, index) {
                         final event = _events[index];
                         return GestureDetector(
-                          onTap: () => Navigator.of(context).push(
+                          onTap: () {
+                            Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => EventDetailScreen(
                                   event: event, tag: event.id),
                             ),
-                          ),
+                          );
+                          },
                           child: Container(
                             margin: EdgeInsets.all(8.w),
                             decoration: BoxDecoration(

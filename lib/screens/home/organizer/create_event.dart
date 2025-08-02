@@ -12,9 +12,10 @@ import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/event_details_textfield.dart';
 import 'package:toastification/toastification.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+
 
 class CreateEvent extends StatefulWidget {
-
   const CreateEvent({super.key});
 
   @override
@@ -34,6 +35,10 @@ class _CreateEventState extends State<CreateEvent> {
   @override
   void initState() {
     super.initState();
+  }
+
+    String formatDate(DateTime date) {
+    return DateFormat.yMMMMEEEEd().add_jm().format(date);
   }
 
   Future<String> uploadToUploadcare(File file) async {
@@ -222,9 +227,7 @@ class _CreateEventState extends State<CreateEvent> {
                         Gap(10.w),
                         Text(
                           selectedDateTime != null
-                              ? '${selectedDateTime!.toLocal()}'
-                                  .split('.')
-                                  .first
+                              ? formatDate(selectedDateTime!)
                               : 'Select date & time',
                           style: TextStyle(
                             color: selectedDateTime != null
@@ -475,6 +478,7 @@ class _CreateEventState extends State<CreateEvent> {
                                 };
                               }).toList(),
                             );
+
                             if (context.mounted) {
                               showToast(
                                 'Event created successfully!',

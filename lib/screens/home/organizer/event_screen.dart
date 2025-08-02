@@ -111,7 +111,7 @@ class _EventScreenState extends State<EventScreen>
           MaterialPageRoute(
             builder: (_) => AttendeesScreen(attendees: attendees),
           ),
-          );
+        );
       },
       child: Container(
         margin: EdgeInsets.all(8.w),

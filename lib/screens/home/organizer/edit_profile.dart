@@ -36,6 +36,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     currentUser = Provider.of<UserProvider>(context, listen: false).user!;
     nameController.text = currentUser.name;
+    organizationNameController.text = currentUser.organizationName ?? '';
     phoneController.text = currentUser.phoneNumber;
   }
 
@@ -44,7 +45,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     String phone = phoneController.text.trim();
     String organizationName = organizationNameController.text.trim();
 
-    if (name.isEmpty || phone.isEmpty) {
+    if (name.isEmpty || phone.isEmpty || (widget.isOrg && organizationName.isEmpty)) {
       showToast(
         'All fields are required.',
         ToastificationType.error,
@@ -59,13 +60,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await _databaseService.updateUserProfile(
         name: name,
         phone: phone,
-        organizationName: !widget.isOrg ? organizationName : null,
+        organizationName: widget.isOrg ? organizationName : null,
       );
 
       final updatedUser = currentUser.copyWith(
         name: name,
         phoneNumber: phone,
-        organizationName: !widget.isOrg ? organizationName : null,
+        organizationName: widget.isOrg ? organizationName : null,
       );
 
       if (!mounted) return;

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:logger/logger.dart';
 import 'package:project/models/ticket.dart';
+import 'package:project/providers/ticket_notifier.dart';
 import 'package:project/screens/home/regular_user/ticket_details_screen.dart';
 import 'package:project/services/database_service.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -43,7 +44,7 @@ class _RegularHomeScreenState extends State<RegularHomeScreen>
       final tickets = await _databaseService.fetchUserTickets(uid);
       setState(() => _tickets = tickets);
     } catch (e) {
-      Logger().e('Error fetching tickets: $e');
+      
     } finally {
       setState(() => _loading = false);
     }
@@ -53,6 +54,16 @@ class _RegularHomeScreenState extends State<RegularHomeScreen>
     await _fetchTickets();
     _refreshController.refreshCompleted();
   }
+
+  @override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  final ticketNotifier = Provider.of<TicketNotifier>(context);
+  if (ticketNotifier.shouldRefresh) {
+    _fetchTickets();
+    ticketNotifier.resetRefreshFlag(); 
+  }
+}
 
   @override
   Widget build(BuildContext context) {

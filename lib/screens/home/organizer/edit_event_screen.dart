@@ -8,7 +8,6 @@ import 'package:project/widgets/event_details_textfield.dart';
 import 'package:toastification/toastification.dart';
 
 class EditEvent extends StatefulWidget {
-  static String routeName = '/edit_event';
   final EventModel event;
 
   const EditEvent({super.key, required this.event});

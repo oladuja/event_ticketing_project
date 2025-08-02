@@ -9,7 +9,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+        backgroundColor: const Color.fromARGB(255, 245, 245, 245),
         title: const Text('Privacy Policy',
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -42,8 +42,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               Gap(8.h),
               Text(
                 '- Personal information (e.g., name, email address)\n'
-                '- Usage data (e.g., app interactions)\n'
-                '- Device information (e.g., device type, OS)',
+                '- Usage data (e.g., app interactions)\n',
                 style: TextStyle(fontSize: 16.sp),
               ),
               Gap(16.h),
@@ -75,7 +74,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               ),
               Gap(16.h),
               Text(
-                'If you have any questions about this Privacy Policy, contact us at support@example.com.',
+                'If you have any questions about this Privacy Policy, contact us at event@support.com.',
                 style: TextStyle(fontSize: 16.h),
               ),
             ],
