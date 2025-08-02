@@ -1,5 +1,5 @@
 name: project
-description: "A new Flutter project."
+description: "Hybrid ticketing platform with Intelligence-driven dynamic pricing and QR code authentication"
 publish_to: 'none' 
 
 version: 1.0.0+1
