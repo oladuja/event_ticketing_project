@@ -14,7 +14,6 @@ import 'package:project/widgets/event_details_textfield.dart';
 import 'package:toastification/toastification.dart';
 import 'package:image_picker/image_picker.dart';
 
-
 class CreateEvent extends StatefulWidget {
   const CreateEvent({super.key});
 
@@ -37,7 +36,7 @@ class _CreateEventState extends State<CreateEvent> {
     super.initState();
   }
 
-    Future<String> uploadToUploadcare(File file) async {
+  Future<String> uploadToUploadcare(File file) async {
     String fileUrl;
     final data = FormData.fromMap({
       'UPLOADCARE_PUB_KEY': '7438886172631afe26cb',

@@ -36,7 +36,7 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
   Future<void> _fetchEvents() async {
     setState(() => _loading = true);
     try {
-      final events = await _databaseService.fetchEvents();
+      final events = await _databaseService.fetchUpcomingEvents();
       setState(() => _events = events);
     } catch (e) {
       if (!mounted) return;

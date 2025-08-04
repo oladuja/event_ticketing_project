@@ -57,23 +57,29 @@ class DatabaseService {
     }
   }
 
-  Future<List<EventModel>> fetchEvents() async {
-    try {
-      final snapshot = await _db.child('events').get();
-      List<EventModel> events = [];
-      if (snapshot.exists) {
-        final data = Map<String, dynamic>.from(snapshot.value as Map);
-        data.forEach((key, value) {
-          events.add(EventModel.fromJson(Map<String, dynamic>.from(value)));
-        });
-      }
-      events.sort((a, b) => b.date.compareTo(a.date));
+  Future<List<EventModel>> fetchUpcomingEvents() async {
+  try {
+    final snapshot = await _db.child('events').get();
+    if (!snapshot.exists) return [];
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
 
-      return events;
-    } catch (e) {
-      rethrow;
-    }
+    final data = Map<String, dynamic>.from(snapshot.value as Map);
+    final events = data.values
+        .map((e) => EventModel.fromJson(Map<String, dynamic>.from(e)))
+        .where((event) {
+          final date = DateTime(event.date.year, event.date.month, event.date.day);
+          return !date.isBefore(todayDate);
+        })
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    return events;
+  } catch (e) {
+    rethrow;
   }
+}
+
 
   Future<List<EventModel>> fetchOrganizerEventsByID(String organizerId) async {
     try {
