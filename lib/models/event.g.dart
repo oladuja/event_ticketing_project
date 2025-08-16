@@ -11,7 +11,9 @@ EventModel _$EventModelFromJson(Map<String, dynamic> json) => EventModel(
       imageUrl: json['imageUrl'] as String,
       eventName: json['eventName'] as String,
       description: json['description'] as String,
-      location: json['location'] as String,
+      location: (json['location'] as List<dynamic>)
+          .map((e) => e as Map<String, dynamic>)
+          .toList(),
       eventType: json['eventType'] as String,
       category: json['category'] as String,
       date: EventModel._fromJson((json['date'] as num).toInt()),

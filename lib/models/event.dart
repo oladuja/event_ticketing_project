@@ -9,7 +9,7 @@ class EventModel {
   final String imageUrl;
   final String eventName;
   final String description;
-  final String location;
+  final List<Map<String, dynamic>> location;
   final String eventType;
   final String category;
   final String organizerId;
@@ -47,7 +47,7 @@ class EventModel {
     String? imageUrl,
     String? eventName,
     String? description,
-    String? location,
+    List<Map<String, dynamic>>? location,
     String? eventType,
     String? organizerId,
     String? category,

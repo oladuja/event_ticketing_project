@@ -1,13 +1,11 @@
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:project/screens/home/organizer/home.dart';
-import 'package:project/services/auth_service.dart';
-import 'package:project/services/database_service.dart';
+import 'package:project/screens/home/organizer/event_locations_screen.dart';
+
 import 'package:project/utils/format_date.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:project/widgets/event_details_textfield.dart';
@@ -22,12 +20,9 @@ class CreateEvent extends StatefulWidget {
 }
 
 class _CreateEventState extends State<CreateEvent> {
-  final dio = Dio();
   final TextEditingController eventNameController = TextEditingController();
   final TextEditingController eventDescriptionController =
       TextEditingController();
-  final TextEditingController eventAddressController = TextEditingController();
-  final TextEditingController noOfTicketsController = TextEditingController();
   File? eventImage;
   bool isLoading = false;
 
@@ -36,30 +31,7 @@ class _CreateEventState extends State<CreateEvent> {
     super.initState();
   }
 
-  Future<String> uploadToUploadcare(File file) async {
-    String fileUrl;
-    final data = FormData.fromMap({
-      'UPLOADCARE_PUB_KEY': '7438886172631afe26cb',
-      'UPLOADCARE_STORE': '1',
-      'file': await MultipartFile.fromFile(file.path),
-    });
-
-    try {
-      final response = await dio.post(
-        'https://upload.uploadcare.com/base/',
-        data: data,
-        options: Options(
-          headers: {
-            'Accept': 'application/json',
-          },
-        ),
-      );
-      fileUrl = "https://ucarecdn.com/${response.data['file']}/";
-      return fileUrl;
-    } catch (e) {
-      rethrow;
-    }
-  }
+  
 
   final eventTypes = [
     'Conference',
@@ -114,12 +86,67 @@ class _CreateEventState extends State<CreateEvent> {
     }
   }
 
+  Future<void> _proceedToLocations() async {
+    final hasValidTickets = tickets.isNotEmpty &&
+        tickets.every((ticket) =>
+            ticket['name']!.text.isNotEmpty &&
+            ticket['price']!.text.isNotEmpty);
+
+    if (eventNameController.text.isEmpty ||
+        eventDescriptionController.text.isEmpty ||
+        selectedEventType == null ||
+        selectedDateTime == null ||
+        selectedCategory == null ||
+        eventImage == null ||
+        !hasValidTickets) {
+      showToast(
+        'Please fill all fields before proceeding.',
+        ToastificationType.error,
+        context,
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final ticketsType = tickets.map((ticket) {
+        return {
+          'name': ticket['name']!.text,
+          'price': int.tryParse(ticket['price']!.text) ?? 0,
+        };
+      }).toList();
+
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => EventLocationsScreen(
+            imageFile: eventImage!,
+            eventName: eventNameController.text,
+            description: eventDescriptionController.text,
+            eventType: selectedEventType!,
+            category: selectedCategory!,
+            date: selectedDateTime!,
+            ticketsType: ticketsType,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      showToast(
+        e.toString(),
+        ToastificationType.error,
+        context,
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
   @override
   dispose() {
     eventNameController.dispose();
     eventDescriptionController.dispose();
-    eventAddressController.dispose();
-    noOfTicketsController.dispose();
     selectedEventType = null;
     selectedCategory = null;
     selectedDateTime = null;
@@ -295,20 +322,6 @@ class _CreateEventState extends State<CreateEvent> {
                 ),
               ),
               EventDetailsField(
-                title: 'Number of Tickets',
-                child: TextField(
-                  controller: noOfTicketsController,
-                  cursorColor: Colors.black,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    enabledBorder: InputBorder.none,
-                    border: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                  ),
-                ),
-              ),
-              EventDetailsField(
                 title: 'Category',
                 child: DropdownButtonFormField(
                   items: [
@@ -327,19 +340,6 @@ class _CreateEventState extends State<CreateEvent> {
                     errorBorder: InputBorder.none,
                   ),
                   onChanged: (_) {},
-                ),
-              ),
-              EventDetailsField(
-                title: 'Event Address',
-                child: TextField(
-                  controller: eventAddressController,
-                  cursorColor: Colors.black,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    enabledBorder: InputBorder.none,
-                    border: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                  ),
                 ),
               ),
               Gap(20.h),
@@ -433,89 +433,7 @@ class _CreateEventState extends State<CreateEvent> {
                       ),
                     )
                   : GestureDetector(
-                      onTap: () async {
-                        setState(() => isLoading = true);
-                        try {
-                          final hasValidTickets = tickets.isNotEmpty &&
-                              tickets.every((ticket) =>
-                                  ticket['name']!.text.isNotEmpty &&
-                                  ticket['price']!.text.isNotEmpty);
-
-                          if (eventNameController.text.isNotEmpty &&
-                              eventDescriptionController.text.isNotEmpty &&
-                              eventAddressController.text.isNotEmpty &&
-                              noOfTicketsController.text.isNotEmpty &&
-                              selectedEventType != null &&
-                              selectedDateTime != null &&
-                              selectedCategory != null &&
-                              eventImage != null &&
-                              hasValidTickets) {
-                            var imageUrl =
-                                await uploadToUploadcare(eventImage!);
-
-                            await DatabaseService().saveEventToDatabase(
-                              imageUrl: imageUrl,
-                              eventName: eventNameController.value.text,
-                              description:
-                                  eventDescriptionController.value.text,
-                              location: eventAddressController.value.text,
-                              eventType: selectedEventType!,
-                              category: selectedCategory!,
-                              date: selectedDateTime!,
-                              organizerId: AuthService().currentUser!.uid,
-                              totalTickets: int.tryParse(
-                                  noOfTicketsController.value.text)!,
-                              ticketsType: tickets.map((ticket) {
-                                return {
-                                  'name': ticket['name']!.text,
-                                  'price':
-                                      int.tryParse(ticket['price']!.text) ?? 0,
-                                };
-                              }).toList(),
-                            );
-
-                            if (context.mounted) {
-                              showToast(
-                                'Event created successfully!',
-                                ToastificationType.success,
-                                context,
-                              );
-                            }
-                          } else {
-                            showToast(
-                              'Please fill all fields before adding an event.',
-                              ToastificationType.error,
-                              context,
-                            );
-                          }
-                          setState(() => isLoading = false);
-                        } catch (e) {
-                          if (context.mounted) {
-                            String errorMessage =
-                                'Something went wrong. Please try again.';
-
-                            if (e.toString().contains('SocketException')) {
-                              errorMessage =
-                                  'No internet connection. Please check your network.';
-                            }
-                            showToast(
-                              errorMessage,
-                              ToastificationType.error,
-                              context,
-                            );
-                          }
-                        } finally {
-                          setState(() => isLoading = false);
-                          if (context.mounted) {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => const Home(),
-                              ),
-                              (route) => false,
-                            );
-                          }
-                        }
-                      },
+                      onTap: _proceedToLocations,
                       child: Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(15.w),
@@ -525,7 +443,7 @@ class _CreateEventState extends State<CreateEvent> {
                         ),
                         child: Center(
                           child: Text(
-                            'Add Event',
+                            'Continue to Locations',
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w600,

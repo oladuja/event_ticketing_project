@@ -110,7 +110,7 @@ class DatabaseService {
     required String imageUrl,
     required String eventName,
     required String description,
-    required String location,
+    required List<Map<String, dynamic>> locations,
     required String eventType,
     required String organizerId,
     required String category,
@@ -128,7 +128,7 @@ class DatabaseService {
         imageUrl: imageUrl,
         eventName: eventName,
         description: description,
-        location: location,
+        location: locations,
         eventType: eventType,
         category: category,
         date: date,
@@ -246,6 +246,7 @@ class DatabaseService {
     required String buyerId,
     required String ticketType,
     required String organizerName,
+    required String location,
   }) async {
     try {
       final eventRef = _db.child('events/${event.id}');
@@ -309,7 +310,7 @@ class DatabaseService {
         id: ticketId,
         imageUrl: event.imageUrl,
         eventName: event.eventName,
-        location: event.location,
+        location: location,
         datePurchased: DateTime.now(),
         dateOfEvent: event.date,
         ticketType: ticketType,

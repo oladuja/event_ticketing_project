@@ -110,7 +110,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   FaIcon(FontAwesomeIcons.locationPin, size: 16.sp),
                   Gap(8.w),
                   Text(
-                    widget.event.location,
+                    'widget.event.location[0]',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -235,6 +235,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             event: widget.event,
                             ticketsBought: quantity,
                             ticketPrice: price,
+                            location: 'location',
                             buyerId: AuthService().currentUser!.uid,
                             ticketType: selectedTicket,
                             organizerName: user.user!.name,

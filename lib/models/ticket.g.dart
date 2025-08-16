@@ -11,8 +11,6 @@ TicketModel _$TicketModelFromJson(Map<String, dynamic> json) => TicketModel(
       imageUrl: json['imageUrl'] as String,
       eventName: json['eventName'] as String,
       location: json['location'] as String,
-      eventId: json['eventId'] as String,
-      attendeeId: json['attendeeId'] as String,
       datePurchased:
           TicketModel._fromJson((json['datePurchased'] as num).toInt()),
       dateOfEvent: TicketModel._fromJson((json['dateOfEvent'] as num).toInt()),
@@ -20,6 +18,8 @@ TicketModel _$TicketModelFromJson(Map<String, dynamic> json) => TicketModel(
       eventOrganizer: json['eventOrganizer'] as String,
       price: (json['price'] as num).toDouble(),
       numberOfTickets: (json['numberOfTickets'] as num).toInt(),
+      eventId: json['eventId'] as String,
+      attendeeId: json['attendeeId'] as String,
     );
 
 Map<String, dynamic> _$TicketModelToJson(TicketModel instance) =>
@@ -27,9 +27,9 @@ Map<String, dynamic> _$TicketModelToJson(TicketModel instance) =>
       'id': instance.id,
       'imageUrl': instance.imageUrl,
       'eventName': instance.eventName,
-      'location': instance.location,
       'eventId': instance.eventId,
       'attendeeId': instance.attendeeId,
+      'location': instance.location,
       'datePurchased': TicketModel._toJson(instance.datePurchased),
       'dateOfEvent': TicketModel._toJson(instance.dateOfEvent),
       'ticketType': instance.ticketType,

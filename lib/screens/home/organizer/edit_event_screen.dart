@@ -52,7 +52,7 @@ class _EditEventState extends State<EditEvent> {
     final event = widget.event;
     eventNameController.text = event.eventName;
     eventDescriptionController.text = event.description;
-    eventAddressController.text = event.location;
+    eventAddressController.text = 'event.location';
     selectedEventType = event.eventType;
     selectedCategory = event.category;
     _selectedDateTime = event.date;
@@ -200,7 +200,7 @@ class _EditEventState extends State<EditEvent> {
                     final updatedEvent = widget.event.copyWith(
                       eventName: eventNameController.text.trim(),
                       description: eventDescriptionController.text.trim(),
-                      location: eventAddressController.text.trim(),
+                      location: [],
                       eventType: selectedEventType!,
                       category: selectedCategory!,
                       date: _selectedDateTime!,
