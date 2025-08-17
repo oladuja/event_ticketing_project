@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/event.dart';
 import 'package:project/providers/state_notifier.dart';
-import 'package:project/screens/home/organizer/attendees_screen.dart';
+import 'package:project/screens/home/organizer/event_detail.dart';
 import 'package:project/screens/home/organizer/create_event.dart';
 import 'package:project/screens/home/organizer/scan_qr_code.dart';
 import 'package:project/services/auth_service.dart';
@@ -205,8 +205,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                               return GestureDetector(
                                 onTap: () => Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) => AttendeesScreen(
-                                        attendees: event.attendees),
+                                    builder: (_) => EventDetail(event: event),
                                   ),
                                 ),
                                 child: Container(
@@ -229,7 +228,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                                       ),
                                     ),
                                     title: Text(
-                                      '${event.eventName} \nLocation: ${event.location}',
+                                      event.eventName,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16.sp,

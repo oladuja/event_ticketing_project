@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:project/models/ticket.dart';
 import 'package:project/providers/user_provider.dart';
+import 'package:project/utils/amount_format.dart';
 import 'package:project/utils/format_date.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -28,7 +29,7 @@ class TicketDetailsScreen extends StatelessWidget {
       'eventName': ticket.eventName,
       'eventOrganizer': ticket.eventOrganizer,
       'location': ticket.location,
-      'price': ticket.price,
+      'price': formatCurrency(ticket.price),
       'numberOfTickets': ticket.numberOfTickets,
       'dateOfEvent': formattedDate,
     };
@@ -69,7 +70,7 @@ class TicketDetailsScreen extends StatelessWidget {
               Gap(5.h),
               ticketInformation('EVENT LOCATION', ticket.location),
               Gap(5.h),
-              ticketInformation('PRICE', '₦${ticket.price.toStringAsFixed(2)}'),
+              ticketInformation('PRICE', formatCurrency(ticket.price)),
               Gap(5.h),
               ticketInformation('TICKET TYPE', ticket.ticketType),
               Gap(5.h),

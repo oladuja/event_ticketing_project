@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project/models/event.dart';
-import 'package:project/screens/home/organizer/attendees_screen.dart';
+import 'package:project/screens/home/organizer/event_detail.dart';
 import 'package:project/screens/home/organizer/edit_event_screen.dart';
 import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
@@ -46,12 +46,10 @@ class _EventScreenState extends State<EventScreen>
       setState(() {
         _events = events;
       });
-    } 
-    catch (e) {
+    } catch (e) {
       if (!mounted) return;
       showToast('Failed to load events.', ToastificationType.error, context);
-    }
-    finally {
+    } finally {
       setState(() => _loading = false);
       _refreshController.refreshCompleted();
     }
@@ -112,11 +110,10 @@ class _EventScreenState extends State<EventScreen>
   Widget _buildEventTile(EventModel event) {
     return GestureDetector(
       onTap: () async {
-        final attendees = await _databaseService.fetchEventAttendees(event.id);
         if (!mounted) return;
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => AttendeesScreen(attendees: attendees),
+            builder: (_) => EventDetail(event: event),
           ),
         );
       },
@@ -139,7 +136,7 @@ class _EventScreenState extends State<EventScreen>
             ),
           ),
           title: Text(
-            '${event.eventName} \nLocation: ${event.location}',
+            event.eventName,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
           ),
           subtitle: Text(

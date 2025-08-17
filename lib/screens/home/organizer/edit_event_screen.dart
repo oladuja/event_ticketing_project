@@ -23,7 +23,6 @@ class _EditEventState extends State<EditEvent> {
   final TextEditingController eventNameController = TextEditingController();
   final TextEditingController eventDescriptionController =
       TextEditingController();
-  final TextEditingController eventAddressController = TextEditingController();
 
   final eventTypes = [
     'Conference',
@@ -52,7 +51,6 @@ class _EditEventState extends State<EditEvent> {
     final event = widget.event;
     eventNameController.text = event.eventName;
     eventDescriptionController.text = event.description;
-    eventAddressController.text = 'event.location';
     selectedEventType = event.eventType;
     selectedCategory = event.category;
     _selectedDateTime = event.date;
@@ -180,27 +178,17 @@ class _EditEventState extends State<EditEvent> {
                   decoration: const InputDecoration(border: InputBorder.none),
                 ),
               ),
-              EventDetailsField(
-                title: 'Event Address',
-                child: TextField(
-                  controller: eventAddressController,
-                  cursorColor: Colors.black,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                ),
-              ),
               Gap(20.h),
               GestureDetector(
                 onTap: () async {
                   if (eventNameController.text.isNotEmpty &&
                       eventDescriptionController.text.isNotEmpty &&
-                      eventAddressController.text.isNotEmpty &&
                       selectedEventType != null &&
                       _selectedDateTime != null &&
                       selectedCategory != null) {
                     final updatedEvent = widget.event.copyWith(
                       eventName: eventNameController.text.trim(),
                       description: eventDescriptionController.text.trim(),
-                      location: [],
                       eventType: selectedEventType!,
                       category: selectedCategory!,
                       date: _selectedDateTime!,

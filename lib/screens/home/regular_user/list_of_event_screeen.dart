@@ -40,7 +40,7 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
       setState(() => _events = events);
     } catch (e) {
       if (!mounted) return;
-     showToast(
+      showToast(
         'Failed to load events.',
         ToastificationType.error,
         context,
@@ -106,13 +106,17 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
                       itemBuilder: (context, index) {
                         final event = _events[index];
                         return GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => EventDetailScreen(
-                                  event: event, tag: event.id),
-                            ),
-                          );
+                          onTap: () async {
+                            final result = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => EventDetailScreen(
+                                    event: event, tag: event.id),
+                              ),
+                            );
+
+                            if (result == true) {
+                              _fetchEvents();
+                            }
                           },
                           child: Container(
                             margin: EdgeInsets.all(8.w),
@@ -139,7 +143,7 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
                                 ),
                               ),
                               title: Text(
-                                '${event.eventName}\nLocation: ${event.location}',
+                                event.eventName,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16.sp,
@@ -147,7 +151,6 @@ class _ListOfEventScreeenState extends State<ListOfEventScreeen>
                               ),
                               subtitle: Text(
                                 '${formatDate(event.date)}\n'
-                                'Price: ₦${event.ticketsType.isNotEmpty ? event.ticketsType.first["price"] : "N/A"}\n'
                                 '${event.availableTickets} Ticket(s) Left',
                                 style: TextStyle(fontSize: 12.sp),
                               ),

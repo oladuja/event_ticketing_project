@@ -8,10 +8,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:project/models/event.dart';
 import 'package:project/models/user.dart';
-import 'package:project/providers/state_notifier.dart';
 import 'package:project/providers/user_provider.dart';
 import 'package:project/services/auth_service.dart';
 import 'package:project/services/database_service.dart';
+import 'package:project/utils/amount_format.dart';
 import 'package:project/utils/format_date.dart';
 import 'package:project/utils/show_toast.dart';
 import 'package:provider/provider.dart';
@@ -29,13 +29,36 @@ class EventDetailScreen extends StatefulWidget {
 
 class _EventDetailScreenState extends State<EventDetailScreen> {
   String selectedTicket = '';
+  String selectedLocationId = '';
   int quantity = 1;
+  UserModel? organizer;
+  bool isLoadingOrganizer = true;
 
   @override
   void initState() {
     super.initState();
     if (widget.event.ticketsType.isNotEmpty) {
       selectedTicket = widget.event.ticketsType.first['name'] ?? '';
+    }
+    _loadOrganizer();
+  }
+
+  Future<void> _loadOrganizer() async {
+    try {
+      final organizerData =
+          await DatabaseService().getOrganizerById(widget.event.organizerId);
+      if (mounted) {
+        setState(() {
+          organizer = organizerData;
+          isLoadingOrganizer = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoadingOrganizer = false;
+        });
+      }
     }
   }
 
@@ -45,6 +68,28 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       orElse: () => {'price': 0},
     );
     return double.tryParse(ticket['price'].toString()) ?? 0;
+  }
+
+  Map<String, dynamic>? _getSelectedLocation() {
+    if (selectedLocationId.isEmpty) return null;
+    return widget.event.location.firstWhere(
+      (loc) => loc['placeId'] == selectedLocationId,
+      orElse: () => {},
+    );
+  }
+
+  int _getAvailableTicketsForLocation() {
+    final location = _getSelectedLocation();
+    if (location == null) return 0;
+    return location['ticketCount'] ?? 0;
+  }
+
+  bool _canPurchase() {
+    return selectedLocationId.isNotEmpty &&
+        _getAvailableTicketsForLocation() >= quantity &&
+        widget.event.ticketsType.isNotEmpty &&
+        selectedTicket.isNotEmpty &&
+        widget.event.availableTickets > 0;
   }
 
   @override
@@ -107,21 +152,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               Gap(5.h),
               Row(
                 children: [
-                  FaIcon(FontAwesomeIcons.locationPin, size: 16.sp),
-                  Gap(8.w),
-                  Text(
-                    'widget.event.location[0]',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              Gap(10.h),
-              Row(
-                children: [
                   FaIcon(FontAwesomeIcons.ticket, size: 16.sp),
                   Gap(8.w),
                   Text(
-                    '${widget.event.availableTickets} Ticket(s) Left',
+                    '${widget.event.availableTickets} Total Ticket(s) Left',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -131,23 +165,124 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 children: [
                   FaIcon(FontAwesomeIcons.userGroup, size: 16.sp),
                   Gap(8.w),
-                  FutureBuilder<UserModel?>(
-                    future: DatabaseService()
-                        .getOrganizerById(widget.event.organizerId),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Container();
-                      } else if (!snapshot.hasData || snapshot.data == null) {
-                        return Container();
-                      } else {
-                        final organizer = snapshot.data!;
-                        return Text("Organized by: ${organizer.name}");
-                      }
-                    },
-                  )
+                  if (isLoadingOrganizer)
+                    SizedBox(
+                      width: 16.w,
+                      height: 16.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.grey.shade600),
+                      ),
+                    )
+                  else if (organizer != null)
+                    Text("Organized by: ${organizer!.name}")
+                  else
+                    Text(
+                      "Organizer information unavailable",
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
                 ],
               ),
-              Gap(10.h),
+              Gap(15.h),
+
+              // Locations Section
+              Text(
+                'Select Location',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Gap(8.h),
+
+              if (widget.event.location.isEmpty)
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Text(
+                    'No locations available for this event',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                )
+              else
+                ...widget.event.location.map<Widget>((location) {
+                  final isSelected = selectedLocationId == location['placeId'];
+                  final ticketCount = location['ticketCount'] ?? 0;
+
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 8.h),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF518E99)
+                            : Colors.grey.shade300,
+                        width: isSelected ? 2 : 1,
+                      ),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        location['name'] ?? 'Unknown Location',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            location['address'] ?? '',
+                            style: TextStyle(fontSize: 12.sp),
+                          ),
+                          Text(
+                            '$ticketCount tickets available',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color:
+                                  ticketCount > 0 ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      selected: isSelected,
+                      selectedTileColor: const Color(0xFF518E99)
+                          .withAlpha((0.1 * 255).toInt()),
+                      onTap: ticketCount > 0
+                          ? () {
+                              setState(() {
+                                selectedLocationId = location['placeId'];
+                                // Reset quantity if it exceeds available tickets
+                                if (quantity > ticketCount) {
+                                  quantity = ticketCount;
+                                }
+                              });
+                            }
+                          : null,
+                      enabled: ticketCount > 0,
+                    ),
+                  );
+                }),
+
+              Gap(15.h),
+
+              Text(
+                'Select Ticket Type',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Gap(8.h),
               Wrap(
                 spacing: 8.h,
                 children: widget.event.ticketsType.map<Widget>((ticket) {
@@ -167,10 +302,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               Gap(10.h),
               Text(
-                '₦${price.toStringAsFixed(2)}',
+                formatCurrency(price),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
               ),
               Gap(8.h),
+
+              // Quantity and Purchase Section
               Row(
                 children: [
                   Container(
@@ -196,7 +333,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         IconButton(
                           icon: FaIcon(FontAwesomeIcons.plus, size: 16.sp),
                           onPressed: () {
-                            setState(() => quantity++);
+                            final maxTickets =
+                                _getAvailableTicketsForLocation();
+                            if (quantity < maxTickets) {
+                              setState(() => quantity++);
+                            }
                           },
                         ),
                       ],
@@ -204,66 +345,115 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   ),
                   Gap(10.w),
                   ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        final Customer customer = Customer(
-                          name: user.user!.name,
-                          phoneNumber: user.user!.phoneNumber,
-                          email: user.user!.email,
-                        );
+                    onPressed: _canPurchase()
+                        ? () async {
+                            try {
+                              final Customer customer = Customer(
+                                name: user.user!.name,
+                                phoneNumber: user.user!.phoneNumber,
+                                email: user.user!.email,
+                              );
 
-                        final Flutterwave flutterwave = Flutterwave(
-                          publicKey:
-                              "FLWPUBK_TEST-8248fd5f2c301eed1e7ddc771d83a43d-X",
-                          currency: "NGN",
-                          redirectUrl: "https://google.com",
-                          txRef: DateTime.now().toIso8601String(),
-                          amount: (price * quantity).toStringAsFixed(2),
-                          customer: customer,
-                          paymentOptions: "card",
-                          customization: Customization(
-                            title: 'Pay Now',
-                            description: 'Pay Now',
-                          ),
-                          isTestMode: true,
-                        );
+                              final Flutterwave flutterwave = Flutterwave(
+                                publicKey:
+                                    "FLWPUBK_TEST-8248fd5f2c301eed1e7ddc771d83a43d-X",
+                                currency: "NGN",
+                                redirectUrl: "https://google.com",
+                                txRef: DateTime.now().toIso8601String(),
+                                amount: (price * quantity).toStringAsFixed(2),
+                                customer: customer,
+                                paymentOptions: "card",
+                                customization: Customization(
+                                  title: 'Pay Now',
+                                  description: 'Pay Now',
+                                ),
+                                isTestMode: true,
+                              );
 
-                        final ChargeResponse response =
-                            await flutterwave.charge(context);
-                        if (response.status == 'successful') {
-                          await DatabaseService().handleSuccessfulPurchase(
-                            event: widget.event,
-                            ticketsBought: quantity,
-                            ticketPrice: price,
-                            location: 'location',
-                            buyerId: AuthService().currentUser!.uid,
-                            ticketType: selectedTicket,
-                            organizerName: user.user!.name,
-                          );
-                        }
-                        if (context.mounted) {
-                          Provider.of<StateNotifier>(context, listen: false)
-                              .triggerRefresh();
-                        }
-                      } catch (e) {
-                           if (!context.mounted) return;
-                            showToast('An error occurred while processing payment',
-                                ToastificationType.error, context);
-                      }
-                    },
+                              final ChargeResponse response =
+                                  await flutterwave.charge(context);
+                              if (response.status == 'successful') {
+                                final selectedLocation =
+                                    _getSelectedLocation()!;
+                                await DatabaseService()
+                                    .handleSuccessfulPurchase(
+                                  event: widget.event,
+                                  ticketsBought: quantity,
+                                  ticketPrice: price,
+                                  location: selectedLocation['address'],
+                                  locationId: selectedLocationId,
+                                  buyerId: AuthService().currentUser!.uid,
+                                  ticketType: selectedTicket,
+                                );
+
+                                if (context.mounted) {
+                                  showToast('Tickets purchased successfully!',
+                                      ToastificationType.success, context);
+                                  // Provider.of<StateNotifier>(context,
+                                  //         listen: false)
+                                  //     .triggerRefresh();
+                                  Navigator.pop(context, true);
+                                }
+                              } else {
+                                if (context.mounted) {
+                                  showToast(
+                                      'Payment was not successful. Please try again.',
+                                      ToastificationType.error,
+                                      context);
+                                }
+                              }
+                            } catch (e) {
+                              if (!context.mounted) return;
+
+                              String errorMessage =
+                                  'An error occurred while processing payment';
+                              if (e.toString().contains(
+                                  'Tickets are no longer available')) {
+                                errorMessage =
+                                    'Sorry, these tickets are no longer available. Please refresh and try again.';
+                              } else if (e
+                                  .toString()
+                                  .contains('No tickets available')) {
+                                errorMessage =
+                                    'No tickets available for this event or location.';
+                              }
+
+                              showToast(errorMessage, ToastificationType.error,
+                                  context);
+                            }
+                          }
+                        : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor:
+                          _canPurchase() ? Colors.black : Colors.grey,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Buy Now',
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      _canPurchase()
+                          ? 'Buy Now (${formatCurrency(price * quantity)})'
+                          : selectedLocationId.isEmpty
+                              ? 'Select Location'
+                              : 'Not Available',
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
               ),
+
+              if (selectedLocationId.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.only(top: 8.h),
+                  child: Text(
+                    'Available at selected location: ${_getAvailableTicketsForLocation()} tickets',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Colors.green,
+                    ),
+                  ),
+                ),
+
               Gap(10.h),
               Text(
                 'Event Description',

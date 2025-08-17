@@ -140,7 +140,7 @@ class _RegularHomeScreenState extends State<RegularHomeScreen>
                                 ),
                               ),
                               title: Text(
-                                '${ticket.eventName}\nLocation: ${ticket.location}',
+                                ticket.eventName,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16.sp,

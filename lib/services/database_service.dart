@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
+import 'package:logger/web.dart';
 import 'package:project/models/attendee.dart';
 import 'package:project/models/event.dart';
 import 'package:project/models/ticket.dart';
@@ -58,28 +61,28 @@ class DatabaseService {
   }
 
   Future<List<EventModel>> fetchUpcomingEvents() async {
-  try {
-    final snapshot = await _db.child('events').get();
-    if (!snapshot.exists) return [];
-    final today = DateTime.now();
-    final todayDate = DateTime(today.year, today.month, today.day);
+    try {
+      final snapshot = await _db.child('events').get();
+      if (!snapshot.exists) return [];
+      final today = DateTime.now();
+      final todayDate = DateTime(today.year, today.month, today.day);
+      final jsonString = json.encode(snapshot.value);
+      final data = Map<String, dynamic>.from(json.decode(jsonString));
 
-    final data = Map<String, dynamic>.from(snapshot.value as Map);
-    final events = data.values
-        .map((e) => EventModel.fromJson(Map<String, dynamic>.from(e)))
-        .where((event) {
-          final date = DateTime(event.date.year, event.date.month, event.date.day);
-          return !date.isBefore(todayDate);
-        })
-        .toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+      final events = data.values
+          .map((e) => EventModel.fromJson(Map<String, dynamic>.from(e)))
+          .where((event) {
+        final date =
+            DateTime(event.date.year, event.date.month, event.date.day);
+        return !date.isBefore(todayDate);
+      }).toList()
+        ..sort((a, b) => a.date.compareTo(b.date));
 
-    return events;
-  } catch (e) {
-    rethrow;
+      return events;
+    } catch (e) {
+      rethrow;
+    }
   }
-}
-
 
   Future<List<EventModel>> fetchOrganizerEventsByID(String organizerId) async {
     try {
@@ -92,14 +95,15 @@ class DatabaseService {
       List<EventModel> events = [];
 
       if (snapshot.exists) {
-        final data = Map<String, dynamic>.from(snapshot.value as Map);
+        final jsonString = json.encode(snapshot.value);
+        final data = Map<String, dynamic>.from(json.decode(jsonString));
+
         data.forEach((key, value) {
           events.add(EventModel.fromJson(Map<String, dynamic>.from(value)));
         });
 
         events.sort((a, b) => b.date.compareTo(a.date));
       }
-
       return events;
     } catch (e) {
       rethrow;
@@ -160,9 +164,12 @@ class DatabaseService {
           .orderByChild('organizerId')
           .equalTo(organizerId)
           .get();
+
       List<EventModel> events = [];
-      if (snapshot.exists) {
-        final data = Map<String, dynamic>.from(snapshot.value as Map);
+
+      if (snapshot.exists && snapshot.value != null) {
+        final jsonString = json.encode(snapshot.value);
+        final data = Map<String, dynamic>.from(json.decode(jsonString));
 
         final now = DateTime.now();
         final startOfDay =
@@ -171,19 +178,27 @@ class DatabaseService {
             .millisecondsSinceEpoch;
 
         data.forEach((key, value) {
-          final map = Map<String, dynamic>.from(value);
-          final eventDate = map['date'];
-          if (eventDate is int &&
-              eventDate >= startOfDay &&
-              eventDate <= endOfDay) {
-            final event = EventModel.fromJson(map);
-            events.add(event);
+          try {
+            final eventData = Map<String, dynamic>.from(value);
+            final eventDate = eventData['date'];
+
+            if (eventDate is int &&
+                eventDate >= startOfDay &&
+                eventDate <= endOfDay) {
+              final event = EventModel.fromJson(eventData);
+              events.add(event);
+            }
+          } catch (e) {
+            Logger().w('Error parsing event $key: $e');
           }
         });
+
         events.sort((a, b) => b.date.compareTo(a.date));
       }
+
       return events;
     } catch (e) {
+      Logger().e('Error fetching today events: $e');
       rethrow;
     }
   }
@@ -245,17 +260,41 @@ class DatabaseService {
     required double ticketPrice,
     required String buyerId,
     required String ticketType,
-    required String organizerName,
     required String location,
+    required String locationId,
   }) async {
     try {
       final eventRef = _db.child('events/${event.id}');
       final attendeesRef = eventRef.child('attendees');
       final organizerRef = _db.child('users/${event.organizerId}');
       final buyerTicketsRef = _db.child('tickets/$buyerId');
+      String eventCreatorName = '';
+
+      if (event.availableTickets <= 0) {
+        throw Exception('No tickets available for this event');
+      }
 
       if (event.availableTickets < ticketsBought) {
         throw Exception('Not enough tickets available');
+      }
+
+      final locationIndex = event.location.indexWhere(
+        (loc) => loc['placeId'] == locationId,
+      );
+
+      if (locationIndex == -1) {
+        throw Exception('Location not found');
+      }
+
+      final selectedLocation = event.location[locationIndex];
+      final locationTicketCount = selectedLocation['ticketCount'] ?? 0;
+
+      if (locationTicketCount <= 0) {
+        throw Exception('No tickets available at this location');
+      }
+
+      if (locationTicketCount < ticketsBought) {
+        throw Exception('Not enough tickets available at this location');
       }
 
       final newAttendeeRef = attendeesRef.push();
@@ -271,6 +310,10 @@ class DatabaseService {
 
       await eventRef.update({
         'availableTickets': event.availableTickets - ticketsBought,
+      });
+
+      await eventRef.child('location/$locationIndex').update({
+        'ticketCount': locationTicketCount - ticketsBought,
       });
 
       final organizerSnapshot = await organizerRef.get();
@@ -302,6 +345,7 @@ class DatabaseService {
               (ticketPrice * ticketsBought),
         );
         await creatorRef.set(updatedCreator.toJson());
+        eventCreatorName = creatorModel.name;
       }
 
       final newTicketRef = buyerTicketsRef.push();
@@ -314,7 +358,7 @@ class DatabaseService {
         datePurchased: DateTime.now(),
         dateOfEvent: event.date,
         ticketType: ticketType,
-        eventOrganizer: organizerName,
+        eventOrganizer: eventCreatorName,
         price: ticketPrice,
         numberOfTickets: ticketsBought,
         eventId: event.id,
