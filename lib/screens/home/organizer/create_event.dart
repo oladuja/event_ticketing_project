@@ -86,62 +86,103 @@ class _CreateEventState extends State<CreateEvent> {
     }
   }
 
-  Future<void> _proceedToLocations() async {
-    final hasValidTickets = tickets.isNotEmpty &&
-        tickets.every((ticket) =>
-            ticket['name']!.text.isNotEmpty &&
-            ticket['price']!.text.isNotEmpty);
+Future<void> _proceedToLocations() async {
+  if (eventNameController.text.isEmpty ||
+      eventDescriptionController.text.isEmpty ||
+      selectedEventType == null ||
+      selectedDateTime == null ||
+      selectedCategory == null ||
+      eventImage == null) {
+    showToast(
+      'Please fill all fields before proceeding.',
+      ToastificationType.error,
+      context,
+    );
+    return;
+  }
 
-    if (eventNameController.text.isEmpty ||
-        eventDescriptionController.text.isEmpty ||
-        selectedEventType == null ||
-        selectedDateTime == null ||
-        selectedCategory == null ||
-        eventImage == null ||
-        !hasValidTickets) {
+  if (tickets.isEmpty) {
+    showToast(
+      'Please add at least one ticket.',
+      ToastificationType.error,
+      context,
+    );
+    return;
+  }
+
+  for (int i = 0; i < tickets.length; i++) {
+    final name = tickets[i]['name']!.text.trim();
+    final priceText = tickets[i]['price']!.text.trim();
+    final price = int.tryParse(priceText);
+
+    if (name.isEmpty) {
       showToast(
-        'Please fill all fields before proceeding.',
+        'Ticket ${i + 1}: Please enter a ticket name.',
         ToastificationType.error,
         context,
       );
       return;
     }
 
-    setState(() => isLoading = true);
-
-    try {
-      final ticketsType = tickets.map((ticket) {
-        return {
-          'name': ticket['name']!.text,
-          'price': int.tryParse(ticket['price']!.text) ?? 0,
-        };
-      }).toList();
-
-      if (!mounted) return;
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => EventLocationsScreen(
-            imageFile: eventImage!,
-            eventName: eventNameController.text,
-            description: eventDescriptionController.text,
-            eventType: selectedEventType!,
-            category: selectedCategory!,
-            date: selectedDateTime!,
-            ticketsType: ticketsType,
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
+    if (price == null || price <= 0) {
       showToast(
-        e.toString(),
+        'Ticket ${i + 1}: Please enter a valid price greater than 0.',
         ToastificationType.error,
         context,
       );
-    } finally {
-      setState(() => isLoading = false);
+      return;
     }
   }
+
+  final ticketNames = tickets.map((t) => t['name']!.text.trim()).toList();
+  final duplicateNames = ticketNames.toSet()
+    ..removeWhere((name) => ticketNames.indexOf(name) == ticketNames.lastIndexOf(name));
+
+  if (duplicateNames.isNotEmpty) {
+    showToast(
+      'Duplicate ticket names are not allowed.',
+      ToastificationType.error,
+      context,
+    );
+    return;
+  }
+
+  setState(() => isLoading = true);
+
+  try {
+    final ticketsType = tickets.map((ticket) {
+      return {
+        'name': ticket['name']!.text.trim(),
+        'price': int.parse(ticket['price']!.text.trim()),
+      };
+    }).toList();
+
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EventLocationsScreen(
+          imageFile: eventImage!,
+          eventName: eventNameController.text.trim(),
+          description: eventDescriptionController.text.trim(),
+          eventType: selectedEventType!,
+          category: selectedCategory!,
+          date: selectedDateTime!,
+          ticketsType: ticketsType,
+        ),
+      ),
+    );
+  } catch (e) {
+    if (!mounted) return;
+    showToast(
+      e.toString(),
+      ToastificationType.error,
+      context,
+    );
+  } finally {
+    setState(() => isLoading = false);
+  }
+}
+
 
   @override
   dispose() {
